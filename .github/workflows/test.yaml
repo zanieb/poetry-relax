@@ -6,7 +6,8 @@ env:
   PY_COLORS: 1
 
 on:
-  pull_request
+  pull_request:
+    types: [opened, reopened, synchronize]
   push:
     branches:
       - main
