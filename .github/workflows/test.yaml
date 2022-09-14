@@ -85,4 +85,4 @@ jobs:
 
       - name: Run tests
         run: |
-          pytest tests
+          poetry run -- pytest tests
