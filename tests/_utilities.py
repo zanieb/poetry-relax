@@ -4,7 +4,7 @@ from contextlib import contextmanager
 import tomlkit
 import os
 import json
-
+import sys
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 
@@ -110,3 +110,18 @@ def assert_io_contains(content: str, io) -> None:
     output = io.fetch_output()
     print(output)
     assert content in output
+
+
+# Backport Path.is_relative_to from Python 3.9+ to older
+
+if sys.version_info < (3, 9):
+
+    def check_paths_relative(self, *other):
+        try:
+            self.relative_to(*other)
+            return True
+        except ValueError:
+            return False
+
+else:
+    check_paths_relative = Path.is_relative_to
