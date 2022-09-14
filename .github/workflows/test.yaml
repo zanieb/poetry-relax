@@ -41,13 +41,13 @@ jobs:
           - "3.8"
           - "3.9"
           - "3.10"
-          - "3.11"
+          - "3.11-dev"
         poetry-version:
           - "1.2.0"
         
         include:
           # Run 3.11 tests with relaxed constraints
-          - python-version: "3.11"
+          - python-version: "3.11-dev"
             relax: true
 
       fail-fast: false
