@@ -19,6 +19,7 @@ from ._utilities import (
     update_pyproject,
     get_dependency_group,
     assert_io_contains,
+    check_paths_relative,
 )
 
 
@@ -53,8 +54,8 @@ def seeded_relax_command(
     application.add(relax_command.command)
 
     # Assert that the update above was successful
-    assert relax_command.command.poetry.file.path.is_relative_to(
-        seeded_poetry_project_path
+    assert check_paths_relative(
+        relax_command.command.poetry.file, seeded_poetry_project_path
     ), f"""
         The poetry application's config file should be relative to the test project path:
             {seeded_poetry_project_path}

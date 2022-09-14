@@ -11,7 +11,7 @@ from typing import Callable
 from poetry.utils.env import EnvManager, VirtualEnv
 from poetry.console.application import Application as PoetryApplication
 
-from ._utilities import tmpchdir
+from ._utilities import tmpchdir, check_paths_relative
 
 
 @pytest.fixture(scope="session")
@@ -52,8 +52,8 @@ def poetry_application(
     # There are a few assertions in this style, as these fixtures were finicky to get
     # behaving correctly and we want to ensure our assumptions are correct before
     # tests run
-    assert application.poetry.file.path.is_relative_to(
-        poetry_project_path
+    assert check_paths_relative(
+        application.poetry.file.path, poetry_project_path
     ), f"""
         The poetry application's config file should be relative to the test project path:
             {poetry_project_path}
@@ -104,8 +104,8 @@ def base_poetry_project_path(
             )
 
         tmp_path = Path(tmpdir).resolve()
-        assert env.path.is_relative_to(
-            tmp_path
+        assert check_paths_relative(
+            env.path, tmp_path
         ), f"""
             The virtual environment in the base test project should be in the 
             temporary directory:
@@ -208,8 +208,8 @@ def seeded_project_venv(
     print(f"Loading virtual environment at {executable}")
     env = manager.get(reload=True)
 
-    assert env.path.is_relative_to(
-        seeded_poetry_project_path
+    assert check_paths_relative(
+        env.path, seeded_poetry_project_path
     ), f"""
         The virtual environment in the test project should be in the project path:
             {seeded_poetry_project_path} 
