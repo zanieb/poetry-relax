@@ -1,0 +1,72 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "[0-9]+.[0-9]+.[0-9]+"
+      - "[0-9]+.[0-9]+rc[0-9]+"
+      - "[0-9]+.[0-9]+[ab][0-9]+"
+
+jobs:
+  build-release:
+    name: Build package
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Set up Poetry
+        run: |
+          pip install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Relax constraints
+        if: ${{ matrix.relax }}
+        run: |
+          poetry self add $(pwd)
+          poetry relax
+
+      - name: Build package
+        run: |
+          poetry build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ github.ref }}
+          path: "./dist"
+  
+  publish-release:
+    name: Publish package to PyPI
+    needs: [build-release]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Set up Python 3.10
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.10"
+
+      - name: Set up Poetry
+        run: |
+          pip install poetry==${{ env.POETRY_VERSION }}
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: dist-${{ github.ref }}
+          path: "./dist"
+
+      - name: Publish to PyPI
+        env:
+          PYPI_TOKEN: ${{ secrets.PYPI_API_TOKEN }}
+        run: |
+          poetry config pypi-token.pypi $PYPI_API_TOKEN
+          poetry publish
