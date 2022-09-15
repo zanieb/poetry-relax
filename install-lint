@@ -1,0 +1,55 @@
+#!/usr/bin/env python3
+
+import os
+import pathlib
+import re
+import stat
+import textwrap
+
+MARKERS = (
+    "### POETRY-PLUGIN-RELAX BEGIN",
+    "### POETRY-PLUGIN-RELAX END",
+)
+PATTERN = re.compile(
+    f"^{MARKERS[0]}$(.*)^{MARKERS[1]}$",
+    re.DOTALL + re.MULTILINE,
+)
+TARGET = pathlib.Path(".git/hooks/pre-commit")
+SOURCE = pathlib.Path("lint")
+
+
+source_lines = SOURCE.read_text().split(os.linesep)
+# Extract the shebang so we can include it outside the injected content
+source_shebang, source_text = source_lines[0], os.linesep.join(source_lines[1:]).strip()
+
+inject_text = textwrap.dedent(
+    f"""
+    {MARKERS[0]}
+
+    {{}}
+
+    {MARKERS[1]}
+    """
+).format(source_text)
+
+if not TARGET.exists():
+    # Pretend there is some existing text with the shebang
+    existing_text = source_shebang + os.linesep
+else:
+    existing_text = TARGET.read_text()
+
+
+result = PATTERN.sub(inject_text, existing_text)
+if result == existing_text:
+    print("Installing pre-commit hooks...")
+    result += os.linesep + inject_text
+else:
+    print("Found existing installation!")
+    print("Updating pre-commit hooks...")
+
+TARGET.write_text(result)
+
+# Ensure it is executable
+TARGET.chmod(TARGET.stat().st_mode | stat.S_IEXEC)
+
+print("Finished!")

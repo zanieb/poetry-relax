@@ -1,27 +1,21 @@
-import subprocess
-import pytest
 import os
+import subprocess
 import sys
 import uuid
-
-from typing import Callable
 from pathlib import Path
-from cleo.testers.command_tester import CommandTester
+from typing import Callable
+
+import pytest
 from cleo.io.outputs.output import Verbosity
-from poetry_relax import RelaxCommand
+from cleo.testers.command_tester import CommandTester
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import VirtualEnv
 
+from poetry_relax import RelaxCommand
 
-from ._utilities import (
-    assert_pyproject_matches,
-    assert_pyproject_unchanged,
-    tmpchdir,
-    update_pyproject,
-    get_dependency_group,
-    assert_io_contains,
-    check_paths_relative,
-)
+from ._utilities import (assert_io_contains, assert_pyproject_matches,
+                         assert_pyproject_unchanged, check_paths_relative,
+                         get_dependency_group, tmpchdir, update_pyproject)
 
 
 @pytest.fixture

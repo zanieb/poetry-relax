@@ -1,4 +1,5 @@
 from typing import Any
+
 from cleo.helpers import option
 from poetry.console.commands.init import InitCommand
 from poetry.console.commands.installer_command import InstallerCommand
@@ -6,12 +7,9 @@ from poetry.core.factory import Factory
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from tomlkit.toml_document import TOMLDocument
 
-
-from poetry_relax._core import (
-    drop_caret_bound_from_dependency,
-    extract_dependency_config_for_group,
-    run_installer_update,
-)
+from poetry_relax._core import (drop_caret_bound_from_dependency,
+                                extract_dependency_config_for_group,
+                                run_installer_update)
 
 
 class RelaxCommand(InitCommand, InstallerCommand):

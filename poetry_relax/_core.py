@@ -4,12 +4,10 @@ Core utilities for the `poetry relax` functionality.
 import contextlib
 import re
 from copy import copy
-from typing import TYPE_CHECKING, Iterable, Optional, Callable
+from typing import TYPE_CHECKING, Callable, Iterable, Optional
 
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.semver.version_range import VersionRange
-import re
-
 
 if TYPE_CHECKING:
     from poetry.core.packages.dependency import Dependency

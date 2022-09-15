@@ -1,17 +1,16 @@
-import pytest
+import os
+import shutil
 import subprocess
+import sys
 import tempfile
 from pathlib import Path
-import os
-import sys
-import shutil
-
 from typing import Callable
 
-from poetry.utils.env import EnvManager, VirtualEnv
+import pytest
 from poetry.console.application import Application as PoetryApplication
+from poetry.utils.env import EnvManager, VirtualEnv
 
-from ._utilities import tmpchdir, check_paths_relative
+from ._utilities import check_paths_relative, tmpchdir
 
 
 @pytest.fixture(scope="session")
