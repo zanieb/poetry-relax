@@ -101,6 +101,6 @@ $ pytest tests
 
 Run linters before opening pull requests:
 ```bash
-$ ./lint check .
-$ ./lint fix .
+$ ./bin/lint check .
+$ ./bin/lint fix .
 ```
