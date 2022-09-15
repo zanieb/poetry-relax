@@ -2,7 +2,7 @@
 
 A Poetry plugin to remove upper version pins. 
 
-## Motivation
+## Introduction
 
 By default, Poetry pins dependencies with `^x.y.z` which  constrains the versions to `>=x.y.z, <x.0.0`. 
 This prevents dependencies from being upgraded to new major versions without explicit permission. 
