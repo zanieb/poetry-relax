@@ -33,7 +33,6 @@ Relax constraints that Poetry sets an upper version for:
 $ poetry relax
 ```
 
-
 Relax constraints and update packages:
 ```bash
 $ poetry relax --update
@@ -52,9 +51,24 @@ The behavior of Poetry is quite reasonable for local development! This plugin is
 
 Run `poetry relax` before building and publishing package
 
+See it at work in [the release workflow for this project](https://github.com/madkinsz/poetry-plugin-relax/blob/main/.github/workflows/release.yaml).
+
+
 ### Relaxing requirements for testing
 
 Run `poetry relax --update` before tests to test against the newest possible versions of packages
+
+See it at work in [the test workflow for this project](https://github.com/madkinsz/poetry-plugin-relax/blob/main/.github/workflows/test.yaml).
+
+## Frequently asked questions
+
+> Can this plugin change the behavior of `poetry add` to relax constraints?
+
+Not at this time. The Poetry project states that plugins must not alter the behavior of core Poetry commands.
+
+> Does this plugin remove upper constraints I've added?
+
+This plugin will only relax constraints specified with a caret (`^`). Upper constraints added with `<` and `<=` will not be changed.
 
 ## Contributing
 
@@ -81,13 +95,3 @@ Run linters before opening pull requests:
 $ ./lint check .
 $ ./lint fix .
 ```
-
-## Frequently asked questions
-
-> Can this plugin change the behavior of `poetry add` to relax constraints?
-
-Not at this time. The Poetry project states that plugins must not alter the behavior of core Poetry commands.
-
-> Does this plugin remove upper constraints I've added?
-
-This plugin will only relax constraints specified with a caret (`^`). Upper constraints added with `<` and `<=` will not be changed.
