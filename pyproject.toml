@@ -8,7 +8,7 @@ packages = [{include = "poetry_relax"}]
 
 [tool.poetry.dependencies]
 python = "^3.7"
-poetry = "^1.0"
+poetry = "^1.2"
 
 [tool.poetry.plugins."poetry.application.plugin"]
 relax = "poetry_relax:RelaxPlugin"
