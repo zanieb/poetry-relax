@@ -3,7 +3,7 @@
 bold() { echo "$(tput bold)$*$(tput sgr0)"; }
 show() { bold "→ $*" >&2; "$@"; }
 
-git diff --cached --exit-code && bold "Nothing to lint!" && exit 0
+git diff --cached --quiet --exit-code && bold "Nothing to lint!" && exit 0
 
 EXIT_STATUS=0
 
