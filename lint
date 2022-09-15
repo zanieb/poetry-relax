@@ -9,9 +9,9 @@ EXIT_STATUS=0
 
 show git stash --keep-index --include-untracked
 
-show poetry run -- black . || EXIT_STATUS=$?
 show poetry run -- isort . || EXIT_STATUS=$?
-# show poetry run -- mypy --namespace-packages poetry_relax || EXIT_STATUS=$?
+show poetry run -- black . || EXIT_STATUS=$?
+show poetry run -- mypy --namespace-packages poetry_relax || EXIT_STATUS=$?
 
 git stash pop --quiet
 exit $EXIT_STATUS
