@@ -9,7 +9,7 @@ This prevents dependencies from being upgraded to new major versions without exp
 When packages follow semantic versioning, this prevents breaking changes from reaching you. 
 However, including this versioning constraint on published libraries can result in overly constrained packages. 
 Once released, a library's version constraints cannot be updated. 
-This means that if one of the library's dependencies releases a new major version, users of the library cannot use the new version of the dependency until a new version of the library is released — even if the release does not introduce breaking changes that would affect the library. 
+This means that if one of the library's dependencies releases a new major version, users of the library cannot use the new version of the dependency until a new version of the library is released — even if the dependency does not introduce breaking changes that would affect the library. 
 For a single package, this is not often a big deal. 
 However, with many packages this can result in unresolvable compatibilities between version requirements.
 For a much more detailed discussion, see [this blog post](https://iscinumpy.dev/post/bound-version-constraints/).
