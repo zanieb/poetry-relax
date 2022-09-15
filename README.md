@@ -85,7 +85,7 @@ This project is managed with Poetry. Here are the basics for getting started.
 
 Clone the repository:
 ```bash
-$ git clone ...
+$ git clone https://github.com/madkinsz/poetry-relax.git
 $ cd poetry-relax
 ```
 
