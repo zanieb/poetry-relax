@@ -1,6 +1,8 @@
 from typing import Any
 
-from cleo.helpers import option
+# cleo is not PEP 561 compliant must be ignored
+# See https://github.com/python-poetry/cleo/pull/254
+from cleo.helpers import option  # type: ignore
 from poetry.console.commands.init import InitCommand
 from poetry.console.commands.installer_command import InstallerCommand
 from poetry.core.factory import Factory
