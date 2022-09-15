@@ -5,7 +5,7 @@ EXIT_STATUS=0
 bold() { echo "$(tput bold)$*$(tput sgr0)"; }
 show() { bold "
 → $*" >&2; }
-run() { show $*; poetry run -- "$@" || EXIT_STATUS=$?; }
+run() { show $1; poetry run -- "$@" || EXIT_STATUS=$?; }
 
 
 mode="$1"
