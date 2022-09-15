@@ -1,17 +1,30 @@
 #!/usr/bin/env sh
 
-bold() { echo "$(tput bold)$*$(tput sgr0)"; }
-show() { bold "→ $*" >&2; "$@"; }
-
-git diff --cached --quiet --exit-code && bold "Nothing to lint!" && exit 0
-
 EXIT_STATUS=0
 
-show git stash --keep-index --include-untracked
+bold() { echo "$(tput bold)$*$(tput sgr0)"; }
+show() { echo ""; bold "→ $*" >&2; }
+run() { show $*; poetry run -- "$@" || EXIT_STATUS=$?; }
 
-show poetry run -- isort . || EXIT_STATUS=$?
-show poetry run -- black . || EXIT_STATUS=$?
-show poetry run -- mypy --namespace-packages poetry_relax || EXIT_STATUS=$?
+targets="$*"
+if [ -z "$targets" ]; then
+    echo "Checking for staged changes to lint..."
+    git diff --staged --quiet --exit-code && bold "Nothing to lint!" && exit 0
+    targets="."
+else
+    echo "Linting '$targets'"
+fi
 
-git stash pop --quiet
+# TODO: Determine how to get this stash to behave well
+# git stash --keep-index --include-untracked
+
+run isort --profile black --filter-files $targets
+run black $targets
+run mypy --namespace-packages --exclude tests $targets 
+
+# git stash pop --quiet
+
+echo ""
+[ $EXIT_STATUS -eq 0 ] && bold "✔ LGTM" || bold "✘ Lint failed!"
+
 exit $EXIT_STATUS

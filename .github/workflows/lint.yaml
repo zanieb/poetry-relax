@@ -46,20 +46,10 @@ jobs:
           poetry self update
           poetry install
 
-      - name: Run black
+      - name: Lint
         run: |
-          poetry run -- black --check .
-
-      - name: Run mypy
-        run: |
-          # --namespace-packages is required to detect types in the poetry library
-          poetry run -- mypy --namespace-packages poetry_relax
-     
-      - name: Run isort
-        run: |
-          # --namespace-packages is required to detect types in the poetry library
-          poetry run -- isort --check --diff .
-
+          ./lint .
+          
       - name: Check poetry
         run: |
           poetry check
