@@ -80,7 +80,7 @@ jobs:
       - name: Relax constraints
         if: ${{ matrix.relax }}
         run: |
-          poetry self install $(pwd)
+          poetry self add $(pwd)
           poetry relax --update
 
       - name: Run tests
