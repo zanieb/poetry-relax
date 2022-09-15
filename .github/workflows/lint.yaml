@@ -48,17 +48,17 @@ jobs:
 
       - name: Run black
         run: |
-          black --check .
+          poetry run -- black --check .
 
       - name: Run mypy
         run: |
           # --namespace-packages is required to detect types in the poetry library
-          mypy --namespace-packages poetry_relax
+          poetry run -- mypy --namespace-packages poetry_relax
      
       - name: Run isort
         run: |
           # --namespace-packages is required to detect types in the poetry library
-          isort --check --diff .
+          poetry run -- isort --check --diff .
 
       - name: Check poetry
         run: |
