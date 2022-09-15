@@ -2,64 +2,76 @@ import json
 import os
 import sys
 from contextlib import contextmanager
+from functools import partial
 from pathlib import Path
 from typing import Any, Dict, Generator, Union
 
 import tomlkit
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
+PYPROJECT = "pyproject.toml"
+LOCKFILE = "poetry.lock"
 
-def load_pyproject(path: Union[str, Path] = "./pyproject.toml") -> tomlkit.TOMLDocument:
-    return tomlkit.loads(path.read_text())
 
-
-def load_lockfile(path: Union[str, Path] = "./poetry.lock") -> dict:
-    return json.loads(path.read_text())
+def load_tomlfile(path: Union[str, Path] = "./") -> tomlkit.TOMLDocument:
+    return tomlkit.loads(Path(path).read_text())
 
 
 @contextmanager
-def update_pyproject(
-    dirpath: Union[str, Path] = "."
+def update_tomlfile(
+    file: Union[str, Path]
 ) -> Generator[tomlkit.TOMLDocument, None, None]:
     """
-    Asserts that the pyproject.toml file in the given directory (defaults to current)
+    Updates a toml file by reading then yielding the existing contents for mutation.
+    """
+    project_config = load_tomlfile(file)
+    yield project_config
+    Path(file).write_text(tomlkit.dumps(project_config))
+
+
+@contextmanager
+def assert_tomlfile_matches(
+    file: Union[str, Path]
+) -> Generator[tomlkit.TOMLDocument, None, None]:
+    """
+    Asserts that the toml file in the given directory (defaults to current)
     is matches the yielded object after the duration of the context.
 
     Yields the initial contents of the file which can be mutated for comparison.
     """
-    pyproject_path = Path(dirpath) / "pyproject.toml"
-    project_config = load_pyproject(pyproject_path)
+    project_config = load_tomlfile(file)
     yield project_config
-    pyproject_path.write_text(tomlkit.dumps(project_config))
-
-
-@contextmanager
-def assert_pyproject_matches(
-    dirpath: Union[str, Path] = "."
-) -> Generator[tomlkit.TOMLDocument, None, None]:
-    """
-    Asserts that the pyproject.toml file in the given directory (defaults to current)
-    is matches the yielded object after the duration of the context.
-
-    Yields the initial contents of the file which can be mutated for comparison.
-    """
-    pyproject_path = Path(dirpath) / "pyproject.toml"
-    project_config = load_pyproject(pyproject_path)
-    yield project_config
-    new_project_config = load_pyproject(pyproject_path)
+    new_project_config = load_tomlfile(file)
     assert project_config == new_project_config
 
 
 @contextmanager
-def assert_pyproject_unchanged(
-    dirpath: Union[str, Path] = "."
-) -> Generator[None, None, None]:
+def assert_tomlfile_unchanged(file: Union[str, Path]) -> Generator[None, None, None]:
     """
-    Asserts that the pyproject.toml file in the given directory (defaults to current)
+    Asserts that the toml file in the given directory (defaults to current)
     is unchanged during the duration of the context.
     """
-    with assert_pyproject_matches(dirpath):
+    with assert_tomlfile_matches(file):
         yield
+
+
+# Aliases for test readability
+
+assert_pyproject_unchanged = partial(assert_tomlfile_unchanged, PYPROJECT)
+assert_pyproject_matches = partial(assert_tomlfile_matches, PYPROJECT)
+update_pyproject = partial(update_tomlfile, PYPROJECT)
+assert_lockfile_unchanged = partial(assert_tomlfile_unchanged, LOCKFILE)
+assert_lockfile_matches = partial(assert_tomlfile_matches, LOCKFILE)
+load_lockfile = partial(load_tomlfile, LOCKFILE)
+load_pyproject = partial(load_tomlfile, PYPROJECT)
+
+
+def load_lockfile_packages() -> Dict[str, dict]:
+    """
+    Returns a mapping of package names to package information in the current lockfile
+    """
+    lockfile = load_lockfile()
+    return {package["name"]: package for package in lockfile["package"]}
 
 
 @contextmanager
@@ -73,16 +85,16 @@ def tmpchdir(new_dir: Union[str, Path]) -> Generator[None, None, None]:
 
 
 def get_dependency_group(
-    pyproject_config: tomlkit.TOMLDocument, group: str = MAIN_GROUP
+    tomlfile_config: tomlkit.TOMLDocument, group: str = MAIN_GROUP
 ) -> Dict[str, str]:
     """
-    Retrieve a dependency group from the poetry tool config in a pyproject document.
+    Retrieve a dependency group from the poetry tool config in a tomlfile document.
 
     Defaults to the "main" group.
 
-    The given pyproject document may be modified to create empty collections as needed.
+    The given tomlfile document may be modified to create empty collections as needed.
     """
-    poetry_config = pyproject_config["tool"]["poetry"]
+    poetry_config = tomlfile_config["tool"]["poetry"]
 
     if group == MAIN_GROUP:
         if "dependencies" not in poetry_config:
@@ -109,7 +121,8 @@ def get_dependency_group(
 
 def assert_io_contains(content: str, io) -> None:
     output = io.fetch_output()
-    print(output)
+    # Ensure the output can be retrieved again later
+    io.fetch_output = lambda: output
     assert content in output
 
 

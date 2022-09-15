@@ -19,6 +19,7 @@ from ._utilities import (
     assert_pyproject_unchanged,
     check_paths_relative,
     get_dependency_group,
+    load_lockfile_packages,
     tmpchdir,
     update_pyproject,
 )
@@ -324,7 +325,7 @@ def test_dependency_relax_aborted_when_package_does_not_exist(
     )
 
 
-def test_dependency_relaxed_then_upgraded(
+def test_update_flag_upgrades_dependency_after_relax(
     seeded_relax_command: CommandTester,
     seeded_project_venv: VirtualEnv,
     seeded_cloudpickle_version: str,
@@ -349,6 +350,70 @@ def test_dependency_relaxed_then_upgraded(
     assert (
         int(new_cloudpickle_version[0]) > 1
     ), f"The dependency should be updated to the next major version but has version {new_cloudpickle_version}"
+
+
+def test_lock_flag_only_updates_lockfile_after_relax(
+    seeded_relax_command: CommandTester,
+    seeded_project_venv: VirtualEnv,
+    seeded_cloudpickle_version: str,
+):
+    with update_pyproject() as pyproject:
+        pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
+
+    with assert_pyproject_matches() as expected_config:
+        seeded_relax_command.execute("--lock", verbosity=Verbosity.DEBUG)
+
+        expected_config["tool"]["poetry"]["dependencies"]["cloudpickle"] = ">=1.0"
+
+    assert seeded_relax_command.status_code == 0
+
+    lockfile_pkgs = load_lockfile_packages()
+    lock_cloudpickle_version = lockfile_pkgs["cloudpickle"]["version"]
+    assert (
+        lock_cloudpickle_version != seeded_cloudpickle_version
+    ), f"The dependency should be updated in the lockfile but has version {lock_cloudpickle_version}"
+    assert (
+        int(lock_cloudpickle_version.partition(".")[0]) > 1
+    ), f"The dependency should be updated to the next major version but has version {lock_cloudpickle_version}"
+
+    new_cloudpickle_version = seeded_project_venv.run_python_script(
+        "import cloudpickle; print(cloudpickle.__version__)"
+    ).strip()
+    assert (
+        new_cloudpickle_version == seeded_cloudpickle_version
+    ), f"The dependency should not be upgraded but has version {new_cloudpickle_version}"
+
+
+@pytest.mark.parametrize("extra_options", ["", "--update", "--lock", "--no-check"])
+def test_dry_run_flag_prevents_changes(
+    extra_options: str,
+    seeded_relax_command: CommandTester,
+    seeded_project_venv: VirtualEnv,
+    seeded_cloudpickle_version: str,
+):
+    with update_pyproject() as pyproject:
+        pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
+
+    with assert_pyproject_unchanged():
+        seeded_relax_command.execute(f"--dry-run {extra_options}")
+
+    assert seeded_relax_command.status_code == 0
+
+    new_cloudpickle_version = seeded_project_venv.run_python_script(
+        "import cloudpickle; print(cloudpickle.__version__)"
+    ).strip()
+
+    assert (
+        new_cloudpickle_version == seeded_cloudpickle_version
+    ), f"The dependency should not be upgraded but has version {new_cloudpickle_version}"
+
+    if "--no-check" not in extra_options:
+        assert_io_contains(
+            "Performing dry-run update to check versions...", seeded_relax_command.io
+        )
+    assert_io_contains(
+        "Skipped update of config file due to dry-run flag.", seeded_relax_command.io
+    )
 
 
 def test_python_dependency_is_ignored(relax_command: CommandTester):
