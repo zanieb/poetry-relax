@@ -45,6 +45,9 @@ def run_installer_update(
     """
     group = poetry.package.dependency_group(dependency_group_name)
 
+    # Ensure if we are given a generator that we can consume it more than once
+    dependencies = list(dependencies)
+
     for dependency in dependencies:
         with contextlib.suppress(ValueError):
             group.remove_dependency(dependency.name)

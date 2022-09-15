@@ -150,7 +150,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
                 status = run_installer_update(
                     poetry=self.poetry,
                     installer=self.installer,
-                    lockfile_only=option("lock"),
+                    lockfile_only=self.option("lock"),
                     dependencies=(d for _, d in updated_dependencies),
                     dependency_group_name=group,
                     poetry_config=poetry_config,
