@@ -7,6 +7,7 @@ import uuid
 from typing import Callable
 from pathlib import Path
 from cleo.testers.command_tester import CommandTester
+from cleo.io.outputs.output import Verbosity
 from poetry_relax import RelaxCommand
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import VirtualEnv
@@ -332,14 +333,16 @@ def test_dependency_relaxed_then_upgraded(
         pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
 
     with assert_pyproject_matches() as expected_config:
-        seeded_relax_command.execute("--update")
+        seeded_relax_command.execute("--update", verbosity=Verbosity.DEBUG)
 
         expected_config["tool"]["poetry"]["dependencies"]["cloudpickle"] = ">=1.0"
 
     assert seeded_relax_command.status_code == 0
+
     new_cloudpickle_version = seeded_project_venv.run_python_script(
         "import cloudpickle; print(cloudpickle.__version__)"
     ).strip()
+
     assert (
         new_cloudpickle_version != seeded_cloudpickle_version
     ), f"The dependency should be updated but has initial version {new_cloudpickle_version}"
