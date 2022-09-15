@@ -136,12 +136,13 @@ def seeded_base_poetry_project_path(
 ) -> Path:
 
     with tempfile.TemporaryDirectory(prefix="poetry-relax-test-seeded-base") as tmpdir:
+        seeded_base = Path(tmpdir).resolve() / "seeded-base"
 
-        print(f"Creating base seeded project at {tmpdir}")
+        print(f"Creating base seeded project at {seeded_base}")
 
         # Copy the initialized project into a the directory
         shutil.copytree(
-            base_poetry_project_path, tmpdir, dirs_exist_ok=True, symlinks=True
+            base_poetry_project_path, seeded_base, symlinks=True
         )
 
         print(f"Installing 'cloudpickle=={seeded_cloudpickle_version}'")
@@ -153,7 +154,7 @@ def seeded_base_poetry_project_path(
                 "--no-interaction",
                 "-v",
             ],
-            cwd=tmpdir,
+            cwd=seeded_base,
             stderr=subprocess.PIPE,
             stdout=sys.stdout,
             env={**os.environ},
@@ -167,8 +168,7 @@ def seeded_base_poetry_project_path(
 
         print()  # Poetry does not print newlines at the end of install
 
-        tmp_path = Path(tmpdir).resolve()
-        yield tmp_path
+        yield seeded_base
 
 
 @pytest.fixture(scope="session")
