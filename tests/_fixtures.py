@@ -141,9 +141,7 @@ def seeded_base_poetry_project_path(
         print(f"Creating base seeded project at {seeded_base}")
 
         # Copy the initialized project into a the directory
-        shutil.copytree(
-            base_poetry_project_path, seeded_base, symlinks=True
-        )
+        shutil.copytree(base_poetry_project_path, seeded_base, symlinks=True)
 
         print(f"Installing 'cloudpickle=={seeded_cloudpickle_version}'")
         seed_process = subprocess.run(
