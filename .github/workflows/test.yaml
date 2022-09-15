@@ -73,7 +73,6 @@ jobs:
 
       - name: Install packages
         run: |
-          poetry self update
           poetry install
 
       - name: Relax constraints
