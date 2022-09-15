@@ -133,7 +133,9 @@ class RelaxCommand(InitCommand, InstallerCommand):
                     f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
                 )
 
-            should_not_update = self.option("dry-run") or not self.option("update")
+            should_not_update = self.option("dry-run") or not (
+                self.option("update") or self.option("lock")
+            )
             if should_not_update:
                 self.info("Performing dry-run update to check versions...")
 
