@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "poetry-plugin-relax"
+name = "poetry-relax"
 version = "0.1.0"
 description = ""
 authors = ["Zanie <contact@zanie.dev>"]
@@ -23,3 +23,5 @@ mypy = "^0.971"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.mypy-cleo.helpers]

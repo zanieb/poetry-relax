@@ -23,7 +23,7 @@ Instead, we must introduce a plugin to enable alternative behavior without tedio
 The plugin must be installed in Poetry's environment. This requires use of the  `self` subcommand.
 
 ```bash
-$ poetry self add poetry-plugin-relax
+$ poetry self add poetry-relax
 ```
 
 ## Usage
@@ -51,14 +51,14 @@ The behavior of Poetry is quite reasonable for local development! This plugin is
 
 Run `poetry relax` before building and publishing package
 
-See it at work in [the release workflow for this project](https://github.com/madkinsz/poetry-plugin-relax/blob/main/.github/workflows/release.yaml).
+See it at work in [the release workflow for this project](https://github.com/madkinsz/poetry-relax/blob/main/.github/workflows/release.yaml).
 
 
 ### Relaxing requirements for testing
 
 Run `poetry relax --update` before tests to test against the newest possible versions of packages
 
-See it at work in [the test workflow for this project](https://github.com/madkinsz/poetry-plugin-relax/blob/main/.github/workflows/test.yaml).
+See it at work in [the test workflow for this project](https://github.com/madkinsz/poetry-relax/blob/main/.github/workflows/test.yaml).
 
 ## Frequently asked questions
 
@@ -77,7 +77,7 @@ This project is managed with Poetry. Here are the basics for getting started.
 Clone the repository:
 ```bash
 $ git clone ...
-$ cd poetry-plugin-relax
+$ cd poetry-relax
 ```
 
 Install packages for development:
