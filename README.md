@@ -1,8 +1,17 @@
 # Poetry Relax
 
-A Poetry plugin to remove upper version pins. 
+Poetry plugin to relax version pins.
 
-## Introduction
+Relax your library's dependencies: `foobar^2.0.0` to `foobar>=2.0.0`.
+
+With features like:
+- Checks that package requirements are solvable after relaxing
+- Upgrades of dependencies after relaxing
+- Updates of lock file after relaxing
+- Limiting changes to specific dependency groups
+- CLI messages designed to match Poetry's output
+
+## Background
 
 By default, Poetry pins dependencies with `^x.y.z` which  constrains the versions to `>=x.y.z, <x.0.0`. 
 This prevents dependencies from being upgraded to new major versions without explicit permission. 
