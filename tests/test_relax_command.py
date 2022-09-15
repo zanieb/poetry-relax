@@ -13,9 +13,15 @@ from poetry.utils.env import VirtualEnv
 
 from poetry_relax import RelaxCommand
 
-from ._utilities import (assert_io_contains, assert_pyproject_matches,
-                         assert_pyproject_unchanged, check_paths_relative,
-                         get_dependency_group, tmpchdir, update_pyproject)
+from ._utilities import (
+    assert_io_contains,
+    assert_pyproject_matches,
+    assert_pyproject_unchanged,
+    check_paths_relative,
+    get_dependency_group,
+    tmpchdir,
+    update_pyproject,
+)
 
 
 @pytest.fixture
