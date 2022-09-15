@@ -48,7 +48,7 @@ jobs:
 
       - name: Lint
         run: |
-          ./lint .
+          ./lint check .
           
       - name: Check poetry
         run: |

@@ -76,6 +76,12 @@ Run the test suite:
 $ pytest tests
 ```
 
+Run linters before opening pull requests:
+```bash
+$ ./lint check .
+$ ./lint fix .
+```
+
 ## Frequently asked questions
 
 > Can this plugin change the behavior of `poetry add` to relax constraints?

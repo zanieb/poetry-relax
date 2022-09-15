@@ -3,28 +3,47 @@
 EXIT_STATUS=0
 
 bold() { echo "$(tput bold)$*$(tput sgr0)"; }
-show() { echo ""; bold "→ $*" >&2; }
+show() { bold "
+→ $*" >&2; }
 run() { show $*; poetry run -- "$@" || EXIT_STATUS=$?; }
 
+
+mode="$1"
+shift
 targets="$*"
+
+if [ -z "$mode" ]; then
+    mode="fix"
+fi
+
 if [ -z "$targets" ]; then
-    echo "Checking for staged changes to lint..."
+    echo "Checking for staged changes fix..."
     git diff --staged --quiet --exit-code && bold "Nothing to lint!" && exit 0
     targets="."
-else
-    echo "Linting '$targets'"
 fi
 
 # TODO: Determine how to get this stash to behave well
 # git stash --keep-index --include-untracked
 
-run isort --profile black --filter-files $targets
-run black $targets
-run mypy --namespace-packages --exclude tests $targets 
+if [ "$mode" = "check" ]; then
+    echo "Checking for lint..."
+    run isort --profile black --check --diff $targets
+    run black --check --diff $targets
+    run mypy --namespace-packages --exclude tests $targets 
+elif [ "$mode" = "fix" ]; then
+    echo "Fixing lint..."
+    run isort --profile black $targets
+    run black $targets
+else
+    echo "Unknown mode '$mode' expected 'fix' or 'check'."
+    exit 3
+fi;
 
+# TODO: See note above.
 # git stash pop --quiet
 
-echo ""
-[ $EXIT_STATUS -eq 0 ] && bold "✔ LGTM" || bold "✘ Lint failed!"
+[ $EXIT_STATUS -eq 0 ] && bold "
+✔ LGTM" || bold "
+✘ Lint failed!"
 
 exit $EXIT_STATUS
