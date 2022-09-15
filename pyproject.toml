@@ -6,7 +6,7 @@ description = "Plugin for Poetry to relax upper version pins"
 authors = ["Zanie <contact@zanie.dev>"]
 readme = "README.md"
 keywords = ["poetry", "plugin", "versioning", "version"]
-packages = [{include = "src/poetry_relax"}]
+packages = [{ include = "poetry_relax", from = "src" }]
 classifiers = [
     "Development Status :: 4 - Beta",
     "Environment :: Plugins",
