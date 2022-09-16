@@ -30,7 +30,7 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 jobs:
-  run-tests:
+  python-tests:
     name: Python tests
 
     strategy:
@@ -43,7 +43,7 @@ jobs:
           - "3.9"
           - "3.10"
           - "3.11-dev"
-        
+
         include:
           # Run 3.11 tests with relaxed constraints
           - python-version: "3.11-dev"

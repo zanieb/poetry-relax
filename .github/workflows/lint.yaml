@@ -19,10 +19,6 @@ permissions:
 jobs:
   run-tests:
     name: Python linters
-
-    strategy:
-      fail-fast: false
-
     runs-on: ubuntu-latest
     timeout-minutes: 5
 
@@ -48,7 +44,7 @@ jobs:
       - name: Lint
         run: |
           ./bin/lint check .
-          
+
       - name: Check poetry
         run: |
           poetry check
