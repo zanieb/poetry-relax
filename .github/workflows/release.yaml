@@ -31,7 +31,6 @@ jobs:
           pip install poetry==${{ env.POETRY_VERSION }}
 
       - name: Relax constraints
-        if: ${{ matrix.relax }}
         run: |
           poetry self add $(pwd)
           poetry relax
