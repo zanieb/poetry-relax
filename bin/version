@@ -1,0 +1,76 @@
+#!/usr/bin/env python3
+
+import re
+import subprocess
+import sys
+
+
+def panic(message):
+    print(message, file=sys.stderr)
+    exit(1)
+
+
+def run(command):
+    return subprocess.check_output(command).decode().strip()
+
+
+def get_version_parts():
+    git_describe = run(["git", "describe", "--tags", "--always", "--long"])
+    commit_timestamp = run(["git", "show", "-s", "--format=%ct", "HEAD"])
+
+    parts = {}
+
+    parts["timestamp"] = commit_timestamp
+
+    if "-" in git_describe:
+        # TAG-NUM-gHEX
+        match = re.match(r"^(.+)-(\d+)-g([0-9a-f]+)$", git_describe)
+        if not match:
+            panic()
+
+        # tag
+        parts["closest_tag"] = match.group(1)
+
+        # distance: number of commits since tag
+        parts["distance"] = int(match.group(2))
+
+        # commit: short hex revision ID
+        parts["short_hash"] = match.group(3)
+
+    else:
+        # HEX: no tags
+        parts["short_hash"] = git_describe
+
+        parts["closest_tag"] = "0.0.0"
+
+        git_rev_list = run(["git", "rev-list", "HEAD", "--left-right"])
+        # total number of commits
+        parts["distance"] = len(git_rev_list.split())
+
+    return parts
+
+
+if __name__ == "__main__":
+    if not len(sys.argv) > 1:
+        panic("Missing mode. Expected one of 'parts', 'local', 'dev'.")
+
+    mode = sys.argv[1].lower()
+
+    parts = get_version_parts()
+
+    if mode == "parts":
+        print(parts)
+
+    elif mode == "local":
+        print("{closest_tag}+{distance}.{short_hash}".format(**parts))
+
+    elif mode == "dev":
+        # bump patch on closet tag
+        tag_parts = parts["closest_tag"].split(".")
+        tag_parts[-1] = str(int(tag_parts[-1]) + 1)
+        patch_tag = ".".join(tag_parts)
+
+        print("{}.dev{timestamp}".format(patch_tag, **parts))
+
+    else:
+        panic(f"Invalid mode {mode!r}. Expected one of 'parts', 'local', 'dev'.")
