@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "poetry-relax"
-version = "0.1.0"
+version = "0.0.0"
 repository = "https://github.com/madkinsz/poetry-relax"
 description = "Plugin for Poetry to relax upper version pins"
 authors = ["Zanie <contact@zanie.dev>"]
