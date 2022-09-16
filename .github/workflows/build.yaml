@@ -34,14 +34,10 @@ jobs:
           poetry self add $(pwd)
           poetry relax
 
-      - name: Build package
-        run: |
-          poetry build
-
       - name: Publish package
         env:
           POETRY_PYPI_TOKEN_TEST_PYPI: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
           poetry version $(./bin/version dev)
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
-          poetry publish -r test-pypi
+          poetry publish --build -r test-pypi
