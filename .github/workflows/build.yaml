@@ -28,9 +28,12 @@ jobs:
         run: |
           pip install poetry==${{ env.POETRY_VERSION }}
 
-      - name: Relax constraints
+      - name: Install local poetry-relax
         run: |
           poetry self add $(pwd)
+
+      - name: Relax constraints
+        run: |
           poetry relax
 
       - name: Publish package
