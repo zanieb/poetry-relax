@@ -1,9 +1,6 @@
 name: Lint
 
 env:
-  # Enable colored output
-  # https://github.com/pytest-dev/pytest/issues/7443
-  PY_COLORS: 1
   POETRY_VERSION: "1.2.0"
 
 on:
