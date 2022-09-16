@@ -58,7 +58,7 @@ def run_installer_update(
     installer.set_package(poetry.package)
     installer.dry_run(dry_run)
     installer.verbose(verbose)
-    installer.update(True)
+    installer.update()
 
     if lockfile_only:
         installer.lock()
