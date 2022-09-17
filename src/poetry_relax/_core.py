@@ -11,7 +11,8 @@ from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.semver.version_range import VersionRange
 
 if TYPE_CHECKING:
-    from cleo.io.io import IO
+    # See https://github.com/python-poetry/cleo/pull/254 for ignore
+    from cleo.io.io import IO  # type: ignore
     from poetry.core.packages.dependency import Dependency
     from poetry.installation.installer import Installer
     from poetry.poetry import Poetry
@@ -30,9 +31,12 @@ def patch_io_writes(io: "IO", patch_function: callable):
     write = io.write
     io.write_line = functools.partial(patch_function, write_line)
     io.write = functools.partial(patch_function, write)
-    yield
-    io.write_line = write_line
-    io.write = write
+
+    try:
+        yield
+    finally:
+        io.write_line = write_line
+        io.write = write
 
 
 def run_installer_update(

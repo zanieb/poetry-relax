@@ -302,7 +302,7 @@ def test_dependency_relax_aborted_when_constraint_is_not_satisfiable(
 
     assert seeded_relax_command.status_code == 1
     assert_io_contains(
-        "Aborted relax operation due to failure during dependency update",
+        "Aborted relax due to failure during dependency update",
         seeded_relax_command.io,
     )
 
@@ -320,7 +320,7 @@ def test_dependency_relax_aborted_when_package_does_not_exist(
 
     assert seeded_relax_command.status_code == 1
     assert_io_contains(
-        "Aborted relax operation due to failure during dependency update",
+        "Aborted relax due to failure during dependency update",
         seeded_relax_command.io,
     )
 
@@ -409,7 +409,7 @@ def test_dry_run_flag_prevents_changes(
 
     if "--no-check" not in extra_options:
         assert_io_contains(
-            "Performing dry-run update to check versions...", seeded_relax_command.io
+            "Checking dependencies for relaxable constraints", seeded_relax_command.io
         )
     assert_io_contains(
         "Skipped update of config file due to dry-run flag.", seeded_relax_command.io

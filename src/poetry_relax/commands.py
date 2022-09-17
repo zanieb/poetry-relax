@@ -202,7 +202,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
 
         elif status != 0:
             self.line(
-                "Aborted relax operation due to failure during dependency update.",
+                "Aborted relax due to failure during dependency update.",
                 style="fg=red;options=bold",
             )
         else:
