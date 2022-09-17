@@ -127,17 +127,18 @@ class RelaxCommand(InitCommand, InstallerCommand):
 
         # Validate that the update is valid by running the installer
         if self.option("update") or should_check:
-            for old_constraint, dependency in updated_dependencies:
-                self.info(
-                    f"Proposing update for <c1>{dependency.name}</> constraint from "
-                    f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
-                )
+            if self.io.is_verbose():
+                for old_constraint, dependency in updated_dependencies:
+                    self.info(
+                        f"Proposing update for <c1>{dependency.name}</> constraint from "
+                        f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
+                    )
 
             should_not_update = self.option("dry-run") or not (
                 self.option("update") or self.option("lock")
             )
             if should_not_update:
-                self.info("Performing dry-run update to check versions...")
+                self.info("Checking new dependencies can be solved...")
 
             # Cosmetic new line
             self.line("")
@@ -160,10 +161,17 @@ class RelaxCommand(InitCommand, InstallerCommand):
                     poetry_config=poetry_config,
                     dry_run=should_not_update,
                     verbose=self.io.is_verbose(),
+                    silent=(
+                        # Do not display installer output by default, it's confusing
+                        should_not_update
+                        and not self.io.is_verbose()
+                    ),
                 )
             except Exception as exc:
                 self.line(str(exc), style="fg=red;options=bold")
                 status = 1
+            else:
+                self.line("Dependency check successful.")
         else:
             if not should_check:
                 self.info("Skipping check for valid versions.")

@@ -2,6 +2,7 @@
 Core utilities for the `poetry relax` functionality.
 """
 import contextlib
+import functools
 import re
 from copy import copy
 from typing import TYPE_CHECKING, Callable, Iterable, Optional
@@ -10,10 +11,10 @@ from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.semver.version_range import VersionRange
 
 if TYPE_CHECKING:
+    from cleo.io.io import IO
     from poetry.core.packages.dependency import Dependency
     from poetry.installation.installer import Installer
     from poetry.poetry import Poetry
-
 
 # Regular expressions derived from `poetry.core.semver.helpers.parse_constraint`
 # These are used to parse complex constraint strings into single constraints
@@ -21,6 +22,17 @@ AND_CONSTRAINT_SEPARATORS = re.compile(
     r"((?<!^)(?<![~=>< ,]) *(?<!-)[, ](?!-) *(?!,|$))"
 )
 OR_CONSTRAINT_SEPARATORS = re.compile(r"(\s*\|\|?\s*)")
+
+
+@contextlib.contextmanager
+def patch_io_writes(io: "IO", patch_function: callable):
+    write_line = io.write_line
+    write = io.write
+    io.write_line = functools.partial(patch_function, write_line)
+    io.write = functools.partial(patch_function, write)
+    yield
+    io.write_line = write_line
+    io.write = write
 
 
 def run_installer_update(
@@ -32,6 +44,7 @@ def run_installer_update(
     dry_run: bool,
     lockfile_only: bool,
     verbose: bool,
+    silent: bool,
 ) -> int:
     """
     Run an installer update.
@@ -65,7 +78,31 @@ def run_installer_update(
 
     installer.whitelist([d.name for d in dependencies])
 
-    return installer.run()
+    last_line: str = None
+
+    def update_messages_for_dry_run(write, message, **kwargs):
+        nonlocal last_line
+
+        # Prevent duplicate messages
+        # TODO: Determine the root cause of duplicates
+        if message.strip() and message == last_line:
+            return
+        last_line = message
+
+        if dry_run:
+            message = message.replace("Updating", "Would update")
+            message = message.replace("Installing", "Checking")
+            message = message.replace("Skipped", "Would skip")
+
+        return write(message, **kwargs)
+
+    def silence(*args, **kwargs):
+        pass
+
+    with patch_io_writes(
+        installer._io, silence if silent else update_messages_for_dry_run
+    ):
+        return installer.run()
 
 
 def extract_dependency_config_for_group(
