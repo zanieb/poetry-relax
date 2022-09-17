@@ -5,7 +5,7 @@ import contextlib
 import functools
 import re
 from copy import copy
-from typing import TYPE_CHECKING, Callable, Iterable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional
 
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.semver.version_range import VersionRange
@@ -26,7 +26,7 @@ OR_CONSTRAINT_SEPARATORS = re.compile(r"(\s*\|\|?\s*)")
 
 
 @contextlib.contextmanager
-def patch_io_writes(io: "IO", patch_function: callable):
+def patch_io_writes(io: "IO", patch_function: Callable):
     write_line = io.write_line
     write = io.write
     io.write_line = functools.partial(patch_function, write_line)
@@ -82,12 +82,12 @@ def run_installer_update(
 
     installer.whitelist([d.name for d in dependencies])
 
-    last_line: str = None
+    last_line: str = ""
 
     def update_messages_for_dry_run(write, message, **kwargs):
         nonlocal last_line
 
-        # Prevent duplicate messages
+        # Prevent duplicate messages unless they're whitespace
         # TODO: Determine the root cause of duplicates
         if message.strip() and message == last_line:
             return
@@ -104,7 +104,8 @@ def run_installer_update(
         pass
 
     with patch_io_writes(
-        installer._io, silence if silent else update_messages_for_dry_run
+        installer._io,
+        silence if silent else update_messages_for_dry_run,  # type: ignore
     ):
         return installer.run()
 
