@@ -40,6 +40,17 @@ jobs:
         env:
           POETRY_PYPI_TOKEN_TEST_PYPI: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
-          poetry version $(./bin/version dev)
+          version=$(./bin/version dev)
+          poetry version $version
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
           poetry publish --build -r test-pypi
+          # Each time we generate a dev version it gets a new timestamp so we store the
+          # version in a variable for the next step
+          echo "POETRY_RELAX_VERSION=$version" >> $GITHUB_ENV
+
+      - name: Test package installation
+        run: |
+          poetry source add test-pypi https://test.pypi.org/simple/ --secondary
+          poetry add --source test-pypi poetry-relax==${{ env.POETRY_RELAX_VERSION }}
+          installed=$(python -c "import pkg_resources; print(pkg_resources.get_distribution('poetry_relax').version)")
+          test $installed = ${{ env.POETRY_RELAX_VERSION }}
