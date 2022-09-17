@@ -51,6 +51,6 @@ jobs:
       - name: Test package installation
         run: |
           poetry source add test-pypi https://test.pypi.org/simple/ --secondary
-          poetry add --source test-pypi poetry-relax==${{ env.POETRY_RELAX_VERSION }}
+          poetry add --source test-pypi poetry-relax==${{ env.POETRY_RELAX_VERSION }} -vvv
           installed=$(python -c "import pkg_resources; print(pkg_resources.get_distribution('poetry_relax').version)")
           test $installed = ${{ env.POETRY_RELAX_VERSION }}
