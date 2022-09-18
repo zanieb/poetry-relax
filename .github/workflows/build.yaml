@@ -48,6 +48,10 @@ jobs:
           # version in a variable for the next step
           echo "POETRY_RELAX_VERSION=$version" >> $GITHUB_ENV
 
+      - name: Wait for package to be available
+        run: |
+          sleep 30
+
       - name: Test package installation
         run: |
           poetry source add test-pypi https://test.pypi.org/simple/ --secondary
