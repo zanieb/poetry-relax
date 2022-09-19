@@ -1,10 +1,11 @@
 # Poetry Relax
 
-Poetry plugin to relax version pins.
+A [Poetry](https://github.com/python-poetry/poetry) plugin to relax dependency version pins for your Python projects.
 
-Relax your library's dependencies: `foobar^2.0.0` to `foobar>=2.0.0`.
+Relax your library's dependencies: instead of `foobar^2.0.0` you can `foobar>=2.0.0`.
 
 With features like:
+
 - Checks that package requirements are solvable after relaxing
 - Upgrades of dependencies after relaxing
 - Updates of lock file after relaxing
@@ -13,19 +14,22 @@ With features like:
 
 ## Background
 
-By default, Poetry pins dependencies with `^x.y.z` which  constrains the versions to `>=x.y.z, <x.0.0`.
+By default, Poetry pins dependencies with `^x.y.z`, which constrains the versions to `>=x.y.z, <x.0.0`.
 This prevents dependencies from being upgraded to new major versions without explicit permission.
+
 When packages follow semantic versioning, this prevents breaking changes from reaching you.
+
 However, including this versioning constraint on published libraries can result in overly constrained packages.
 Once released, a library's version constraints cannot be updated.
-This means that if one of the library's dependencies releases a new major version, users of the library cannot use the new version of the dependency until a new version of the library is released — even if the dependency does not introduce breaking changes that would affect the library.
+This means if one of the library's dependencies releases a new major version, users of the library cannot use the new version of the dependency until a new version of the library is released — even if the dependency does not introduce breaking changes that would affect the library.
+
 For a single package, this is not often a big deal.
-However, with many packages this can result in unresolvable compatibilities between version requirements.
+However, with many packages, this can result in unresolvable compatibilities between version requirements.
 For a much more detailed discussion, see [this blog post](https://iscinumpy.dev/post/bound-version-constraints/).
 
 The Poetry project has [opted](https://github.com/python-poetry/poetry/issues/3427) [not](https://github.com/python-poetry/poetry/issues/2731) to allow this behavior to be configured.
-Instead, we must introduce a plugin to enable alternative behavior without tedious manual editing.
 
+Poetry Relax introduces a plugin to enable alternative behavior without tedious manual editing.
 
 ## Installation
 
@@ -37,35 +41,38 @@ $ poetry self add poetry-relax
 
 ## Usage
 
-Relax constraints that Poetry sets an upper version for:
+Relax constraints for which Poetry set an upper version:
+
 ```bash
 $ poetry relax
 ```
 
 Relax constraints and update packages:
+
 ```bash
 $ poetry relax --update
 ```
 
 Relax constraints and update the lock file:
+
 ```bash
 $ poetry relax --lock
 ```
 
 ## Examples
 
-The behavior of Poetry is quite reasonable for local development! This plugin is most useful when used in CI/CD pipelines.
+The behavior of Poetry is quite reasonable for local development! The Poetry Relax plugin is most useful when used in CI/CD pipelines.
 
-### Relaxing requirements before publish
+### Relaxing requirements before publishing
 
-Run `poetry relax` before building and publishing package
+Run `poetry relax` before building and publishing a package.
 
 See it at work in [the release workflow for this project](https://github.com/madkinsz/poetry-relax/blob/main/.github/workflows/release.yaml).
 
 
 ### Relaxing requirements for testing
 
-Run `poetry relax --update` before tests to test against the newest possible versions of packages
+Run `poetry relax --update` before tests to test against the newest possible versions of packages.
 
 See it at work in [the test workflow for this project](https://github.com/madkinsz/poetry-relax/blob/main/.github/workflows/test.yaml).
 
