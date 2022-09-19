@@ -72,8 +72,8 @@ jobs:
       - name: Wait for package to be available
         run: >
           until
-            curl --silent "https://test.pypi.org/simple/poetry-relax/" \
-            | grep --quiet "${{ needs.build-and-publish.outputs.build-version }}";
+          curl --silent "https://test.pypi.org/simple/poetry-relax/"
+          | grep --quiet "${{ needs.build-and-publish.outputs.build-version }}";
           do sleep 10;
           done
 
@@ -82,8 +82,8 @@ jobs:
       - name: Install release from Test PyPI
         run: >
           poetry add
-            --source test-pypi
-            poetry-relax==${{ needs.build-and-publish.outputs.build-version }}
+          --source test-pypi
+          poetry-relax==${{ needs.build-and-publish.outputs.build-version }}
 
       - name: Check release version
         run: |
