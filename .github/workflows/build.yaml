@@ -71,11 +71,12 @@ jobs:
 
       - name: Wait for package to be available
         run: |
-          # Check every 10 seconds — timeout enforced at the job level
-          until curl --head --silent --fail \
-            "https://test.pypi.org/project/poetry-relax/${{ needs.build-and-publish.outputs.build-version }}/"; \
-          do sleep 10;
-          done
+          sleep 20
+          # The following succeeds even if the package is not available yet
+          # until curl --head --silent --fail \
+          #   "https://test.pypi.org/project/poetry-relax/${{ needs.build-and-publish.outputs.build-version }}/"; \
+          # do sleep 10;
+          # done
 
       - name: Install release from Test PyPI
         run: |
