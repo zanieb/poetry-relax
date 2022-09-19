@@ -13,7 +13,7 @@ jobs:
     name: Build and publish
     runs-on: ubuntu-latest
     outputs:
-      BUILD_VERSION: ${{ steps.build.outputs.version }}
+      build-version: ${{ steps.build.outputs.version }}
 
     steps:
       - uses: actions/checkout@v3
@@ -72,9 +72,9 @@ jobs:
         run: |
           sleep 15
 
-      - name: Install poetry-relax ${{ needs.build-and-publish.outputs.version }}
+      - name: Install poetry-relax ${{ needs.build-and-publish.outputs.build-version }}
         run: |
-          version=${{ needs.build-and-publish.outputs.version }}
+          version=${{ needs.build-and-publish.outputs.build-version }}
           poetry add --source test-pypi poetry-relax==$version -vvv
           installed=$(python -c "import pkg_resources; print(pkg_resources.get_distribution('poetry_relax').version)")
           test $installed = $version
