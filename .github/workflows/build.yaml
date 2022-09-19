@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-publish:
-    name: Build and publish
+    name: Publish test release
     runs-on: ubuntu-latest
     outputs:
       build-version: ${{ steps.build.outputs.version }}
@@ -38,7 +38,7 @@ jobs:
         run: |
           poetry relax
 
-      - name: Build and publish package
+      - name: Publish to Test PyPI
         id: build
         env:
           POETRY_PYPI_TOKEN_TEST_PYPI: ${{ secrets.TEST_PYPI_API_TOKEN }}
@@ -55,6 +55,7 @@ jobs:
     name: Test install
     runs-on: ubuntu-latest
     needs: build-and-publish
+    timeout-minutes: 5
 
     steps:
       - name: Set up Python 3.10
@@ -70,9 +71,13 @@ jobs:
 
       - name: Wait for package to be available
         run: |
-          sleep 15
+          # Check every 10 seconds — timeout enforced at the job level
+          until curl --head --silent --fail \
+            "https://test.pypi.org/project/poetry-relax/${{ needs.build-and-publish.outputs.build-version }}/"; \
+          do sleep 10;
+          done
 
-      - name: Install poetry-relax ${{ needs.build-and-publish.outputs.build-version }}
+      - name: Install release from Test PyPI
         run: |
           version=${{ needs.build-and-publish.outputs.build-version }}
           poetry add --source test-pypi poetry-relax==$version -vvv
