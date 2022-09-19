@@ -79,7 +79,9 @@ jobs:
 
       - name: Install release from Test PyPI
         run: |
-          version=${{ needs.build-and-publish.outputs.build-version }}
-          poetry add --source test-pypi poetry-relax==$version -vvv
-          installed=$(python -c "import pkg_resources; print(pkg_resources.get_distribution('poetry_relax').version)")
-          test $installed = $version
+          poetry add --source test-pypi poetry-relax==${{ needs.build-and-publish.outputs.build-version }}
+
+      - name: Check release version
+        run: |
+          installed=$(poetry run python -c "import pkg_resources; print(pkg_resources.get_distribution('poetry_relax').version)")
+          test $installed = ${{ needs.build-and-publish.outputs.build-version }}
