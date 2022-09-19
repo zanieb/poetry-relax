@@ -65,7 +65,7 @@ jobs:
       - name: Set up Poetry
         run: |
           pip install poetry==${{ env.POETRY_VERSION }}
-          poetry init --no-interaction
+          poetry init --name 'test-project' --no-interaction
           poetry source add test-pypi https://test.pypi.org/simple/ --secondary
 
       - name: Wait for package to be available
