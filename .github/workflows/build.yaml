@@ -70,17 +70,19 @@ jobs:
           poetry source add test-pypi https://test.pypi.org/simple/ --secondary
 
       - name: Wait for package to be available
-        run: |
-          until \
-            curl --silent "https://test.pypi.org/simple/poetry-relax/" \
-            | grep --quiet "${{ needs.build-and-publish.outputs.build-version }}" \
+        run: >
+          until
+            curl --silent "https://test.pypi.org/simple/poetry-relax/"
+            | grep --quiet "${{ needs.build-and-publish.outputs.build-version }}";
           do sleep 10;
           done
           # Note: The above will not sleep forever due to the job level timeout
 
       - name: Install release from Test PyPI
-        run: |
-          poetry add --source test-pypi poetry-relax==${{ needs.build-and-publish.outputs.build-version }}
+        run: >
+          poetry add
+            --source test-pypi
+            poetry-relax==${{ needs.build-and-publish.outputs.build-version }}
 
       - name: Check release version
         run: |
