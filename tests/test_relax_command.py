@@ -172,36 +172,10 @@ def test_single_dependency_updated_in_group(relax_command: CommandTester):
         ("^1.4,!=1.5", ">=1.4,!=1.5"),
         ("!=1.5,^1.4", "!=1.5,>=1.4"),
         ("^1.4 || !=1.5", ">=1.4 || !=1.5"),
-        ("^1.4 && !=1.5", ">=1.4 && !=1.5"),
-        ("^1.4 && !=1.5", ">=1.4 && !=1.5"),
-        (">=1.4 && !=1.5", ">=1.4 && !=1.5"),
-        ("^1.4 && <= 2.5", ">=1.4 && <= 2.5"),
-    ],
-)
-def test_multiple_constraint_dependency_only_updates_caret(
-    relax_command: CommandTester, input_version, output_version
-):
-    with update_pyproject() as pyproject:
-        pyproject["tool"]["poetry"]["dependencies"]["prefect"] = input_version
-
-    with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--no-check")
-
-        expected_config["tool"]["poetry"]["dependencies"]["prefect"] = output_version
-
-    assert relax_command.status_code == 0
-
-
-@pytest.mark.parametrize(
-    "input_version,output_version",
-    [
-        ("^1.4,!=1.5", ">=1.4,!=1.5"),
-        ("!=1.5,^1.4", "!=1.5,>=1.4"),
-        ("^1.4 || !=1.5", ">=1.4 || !=1.5"),
-        ("^1.4 && !=1.5", ">=1.4 && !=1.5"),
-        ("^1.4 && !=1.5", ">=1.4 && !=1.5"),
-        (">=1.4 && !=1.5", ">=1.4 && !=1.5"),
-        ("^1.4 && <= 2.5", ">=1.4 && <= 2.5"),
+        ("^1.4, !=1.5", ">=1.4, !=1.5"),
+        ("^1.4, !=1.5", ">=1.4, !=1.5"),
+        (">=1.4, !=1.5", ">=1.4, !=1.5"),
+        ("^1.4, <= 2.5", ">=1.4, <= 2.5"),
     ],
 )
 def test_multiple_constraint_dependency_only_updates_caret(
