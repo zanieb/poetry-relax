@@ -99,7 +99,7 @@ This plugin is brand new! Poetry just added their plugin system recently. Effort
 
 > Will this plugin drop the upper bound on Python itself?
 
-Believe it or not, this is an even more contentious subset of this issue as Poetry will not allow packages with no upper bound on Python to exist alongside those that include one. This basically means that we cannot relax this requirement without breaking the vast majority of use-cases. For this reason, we cannot relax `python^3` at this time. See [the the post on the Poetry discussion board](https://github.com/python-poetry/poetry/discussions/3757#discussioncomment-435345) for more details.
+Believe it or not, this is an even more contentious subset of this issue as Poetry will not allow packages with no upper bound on Python to exist alongside those that include one. This basically means that we cannot relax this requirement without breaking the vast majority of use-cases. For this reason, we cannot relax `python^3` at this time. See [the post on the Poetry discussion board](https://github.com/python-poetry/poetry/discussions/3757#discussioncomment-435345) for more details.
 
 ## Contributing
 
