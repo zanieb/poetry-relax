@@ -87,7 +87,7 @@ See it at work in [the test workflow for this project](https://github.com/madkin
 
 > Can this plugin change the behavior of `poetry add` to relax constraints?
 
-Not at this time. The Poetry project states that plugins must not alter the behavior of core Poetry commands.
+Not at this time. The Poetry project states that plugins must not alter the behavior of core Poetry commands. If this behavior would be useful for you, please chime in [on the tracking issue](https://github.com/madkinsz/poetry-relax/issues/5).
 
 > Does this plugin remove upper constraints I've added?
 
