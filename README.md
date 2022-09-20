@@ -15,7 +15,7 @@ It is not feasible to release patches for every previous version of most librari
 When many libraries contain upper version bounds, the dependencies can easily become _unsolvable_ — where libraries have incompatible dependency version requirements.
 By removing upper version bounds from your library, control is returned to the user.
 
-Poetry's default behavior is to include upper version bounds. Many people have [spoken up](https://github.com/python-poetry/poetry/issues/3427) [against](https://github.com/python-poetry/poetry/issues/2731) [this style](https://iscinumpy.dev/post/bound-version-constraints/) of dependency management, including [Python](https://caremad.io/posts/2016/02/versioning-software/) [core](https://bernat.tech/posts/version-numbers/) [developers](https://snarky.ca/why-i-dont-like-semver/).
+Poetry's default behavior is to include upper version bounds. Many people have spoken up against this style of dependency management in the Python ecosystem, including members of the Python core development team. See [the bottom of the readme](#references) for links and additional context.
 
 Since the Poetry project will not allow this behavior to be configured, maintainers have resorted to manual editing of dependency constraints after adding. `poetry relax` aims to automate and simplify this process.
 
@@ -112,3 +112,21 @@ Run linters before opening pull requests:
 $ ./bin/lint check .
 $ ./bin/lint fix .
 ```
+
+## References
+
+There's a lot to read on this topic! It's contentious and causing a lot of problems for maintainers and users.
+
+The following blog posts by Henry Schreiner are quite comprehensive:
+- https://iscinumpy.dev/post/bound-version-constraints/
+- https://iscinumpy.dev/post/poetry-versions/
+
+Content from some members of the Python core developer team:
+- https://hynek.me/articles/semver-will-not-save-you/
+- https://snarky.ca/why-i-dont-like-semver/
+- https://bernat.tech/posts/version-numbers/
+- https://caremad.io/posts/2016/02/versioning-software/
+
+Issues
+- https://github.com/python-poetry/poetry/issues/3427
+- https://github.com/python-poetry/poetry/issues/2731
