@@ -2,34 +2,31 @@
 
 A [Poetry](https://github.com/python-poetry/poetry) plugin to relax dependency version pins for your Python projects.
 
-Relax your library's dependencies: instead of `foobar^2.0.0` you can `foobar>=2.0.0`.
+Relax your library's dependencies from `foobar^2.0.0` to `foobar>=2.0.0`.
 
-With features like:
+By default, Poetry uses caret constraints which would limit `foobar` versions to `<3.0`.
+`poetry relax` removes these upper version bounds, allowing dependencies to be upgraded.
 
-- Checks that package requirements are solvable after relaxing
-- Upgrades of dependencies after relaxing
-- Updates of lock file after relaxing
-- Limiting changes to specific dependency groups
+Removing upper version bounds is important when publishing libraries.
+When searching for versions of dependencies to install, the resolver (e.g. `pip`) must respect the bounds your library specifies.
+When a new version of the dependency is released, consumers of your library _cannot_ install it unless a new version of your library is also released.
+
+It is not feasible to release patches for every previous version of most libraries, which forces users to use the most recent version of the library or be stuck without the new version of the dependency.
+When many libraries contain upper version bounds, the dependencies can easily become _unsolvable_ — where libraries have incompatible dependency version requirements.
+By removing upper version bounds from your library, control is returned to the user.
+
+Poetry's default behavior is to include upper version bounds. Many people have [spoken up](https://github.com/python-poetry/poetry/issues/3427) [against](https://github.com/python-poetry/poetry/issues/2731) [this style](https://iscinumpy.dev/post/bound-version-constraints/) of dependency management, including [Python](https://caremad.io/posts/2016/02/versioning-software/) [core](https://bernat.tech/posts/version-numbers/) [developers](https://snarky.ca/why-i-dont-like-semver/).
+
+Since the Poetry project will not allow this behavior to be configured, maintainers have resorted to manual editing of dependency constraints after adding. `poetry relax` aims to automate and simplify this process.
+
+`poetry relax` provides:
+- Automated removal of upper bound constraints specified with `^`
+- Safety check if package requirements are still solvable after relaxing constraints
+- Upgrade of dependencies after relaxing constraints
+- Update of the lock file without upgrading dependencies
+- Limit dependency relaxation to specific dependency groups
+- Retention of intentional upper bounds indicating true incompatibilities
 - CLI messages designed to match Poetry's output
-
-## Background
-
-By default, Poetry pins dependencies with `^x.y.z`, which constrains the versions to `>=x.y.z, <x.0.0`.
-This prevents dependencies from being upgraded to new major versions without explicit permission.
-
-When packages follow semantic versioning, this prevents breaking changes from reaching you.
-
-However, including this versioning constraint on published libraries can result in overly constrained packages.
-Once released, a library's version constraints cannot be updated.
-This means if one of the library's dependencies releases a new major version, users of the library cannot use the new version of the dependency until a new version of the library is released — even if the dependency does not introduce breaking changes that would affect the library.
-
-For a single package, this is not often a big deal.
-However, with many packages, this can result in unresolvable compatibilities between version requirements.
-For a much more detailed discussion, see [this blog post](https://iscinumpy.dev/post/bound-version-constraints/).
-
-The Poetry project has [opted](https://github.com/python-poetry/poetry/issues/3427) [not](https://github.com/python-poetry/poetry/issues/2731) to allow this behavior to be configured.
-
-Poetry Relax introduces a plugin to enable alternative behavior without tedious manual editing.
 
 ## Installation
 
@@ -61,7 +58,7 @@ $ poetry relax --lock
 
 ## Examples
 
-The behavior of Poetry is quite reasonable for local development! The Poetry Relax plugin is most useful when used in CI/CD pipelines.
+The behavior of Poetry is quite reasonable for local development! `poetry relax` is most useful when used in CI/CD pipelines.
 
 ### Relaxing requirements before publishing
 
@@ -86,6 +83,10 @@ Not at this time. The Poetry project states that plugins must not alter the beha
 
 This plugin will only relax constraints specified with a caret (`^`). Upper constraints added with `<` and `<=` will not be changed.
 
+> Is this plugin stable?
+
+This plugin is brand new! Poetry just added their plugin system recently. Efforts will be made to avoid changes in behavior, but it'll be valuable to gather feedback on this plugin in its early stages before releasing a stable version. However, the test suite is thorough and common cases should be well covered.
+
 ## Contributing
 
 This project is managed with Poetry. Here are the basics for getting started.
@@ -96,9 +97,9 @@ $ git clone https://github.com/madkinsz/poetry-relax.git
 $ cd poetry-relax
 ```
 
-Install packages for development:
+Install packages:
 ```bash
-$ poetry install --group dev
+$ poetry install
 ```
 
 Run the test suite:
