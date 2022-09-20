@@ -36,7 +36,7 @@ jobs:
 
       - name: Relax constraints
         run: |
-          poetry relax
+          poetry relax --check
 
       # Note: If build and publish steps are ever separated, the version must
       #       be set before building

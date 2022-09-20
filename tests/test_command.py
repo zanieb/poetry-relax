@@ -107,7 +107,7 @@ def test_with_no_pyproject_toml(
     # The error type differs depending on the test fixture used to set up the
     # command, so we cover both
     with pytest.raises((RuntimeError, FileNotFoundError), match="pyproject.toml"):
-        relax_command.execute()
+        relax_command.execute("--check")
 
 
 def test_help(relax_command: CommandTester):
@@ -132,7 +132,7 @@ def test_single_simple_dependency_updated(relax_command: CommandTester, version:
         pyproject["tool"]["poetry"]["dependencies"]["test"] = f"^{version}"
 
     with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--no-check")
+        relax_command.execute()
 
         expected_config["tool"]["poetry"]["dependencies"]["test"] = f">={version}"
 
@@ -145,7 +145,7 @@ def test_multiple_dependencies_updated(relax_command: CommandTester):
         pyproject["tool"]["poetry"]["dependencies"]["bar"] = "^2.0"
 
     with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--no-check")
+        relax_command.execute()
 
         expected_config["tool"]["poetry"]["dependencies"]["foo"] = ">=1.0"
         expected_config["tool"]["poetry"]["dependencies"]["bar"] = ">=2.0"
@@ -159,7 +159,7 @@ def test_single_dependency_updated_in_group(relax_command: CommandTester):
         get_dependency_group(config, "dev")["test"] = "^1.0"
 
     with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--no-check --group dev")
+        relax_command.execute("--group dev")
 
         get_dependency_group(expected_config, "dev")["test"] = ">=1.0"
 
@@ -185,7 +185,7 @@ def test_multiple_constraint_dependency_only_updates_caret(
         pyproject["tool"]["poetry"]["dependencies"]["prefect"] = input_version
 
     with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--no-check")
+        relax_command.execute()
 
         expected_config["tool"]["poetry"]["dependencies"]["prefect"] = output_version
 
@@ -201,7 +201,7 @@ def test_single_dependency_without_caret_constraint_not_updated(
         pyproject["tool"]["poetry"]["dependencies"]["test"] = version
 
     with assert_pyproject_unchanged():
-        relax_command.execute("--no-check")
+        relax_command.execute()
 
     assert relax_command.status_code == 0
 
@@ -215,7 +215,7 @@ def test_dependency_updated_in_one_group_does_not_affect_other_groups(
         get_dependency_group(config, "bar")["test"] = "^3.0"
 
     with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--no-check --group foo")
+        relax_command.execute("--group foo")
 
         get_dependency_group(expected_config)["test"] = "^1.0"
         get_dependency_group(expected_config, "foo")["test"] = ">=2.0"
@@ -232,7 +232,7 @@ def test_dependency_with_additional_options(relax_command: CommandTester):
         }
 
     with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--no-check")
+        relax_command.execute()
 
         expected_config["tool"]["poetry"]["dependencies"]["test"] = {
             "version": ">=1.0",
@@ -251,7 +251,7 @@ def test_dependency_updated_with_validity_check(
         pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
 
     with assert_pyproject_matches() as expected_config:
-        seeded_relax_command.execute()
+        seeded_relax_command.execute("--check")
 
         expected_config["tool"]["poetry"]["dependencies"]["cloudpickle"] = ">=1.0"
 
@@ -272,7 +272,7 @@ def test_dependency_relax_aborted_when_constraint_is_not_satisfiable(
         pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^999.0"
 
     with assert_pyproject_unchanged():
-        seeded_relax_command.execute()
+        seeded_relax_command.execute("--check")
 
     assert seeded_relax_command.status_code == 1
     assert_io_contains(
@@ -290,7 +290,7 @@ def test_dependency_relax_aborted_when_package_does_not_exist(
         pyproject["tool"]["poetry"]["dependencies"][fake_name] = "^1.0"
 
     with assert_pyproject_unchanged():
-        seeded_relax_command.execute()
+        seeded_relax_command.execute("--check")
 
     assert seeded_relax_command.status_code == 1
     assert_io_contains(
@@ -358,7 +358,7 @@ def test_lock_flag_only_updates_lockfile_after_relax(
     ), f"The dependency should not be upgraded but has version {new_cloudpickle_version}"
 
 
-@pytest.mark.parametrize("extra_options", ["", "--update", "--lock", "--no-check"])
+@pytest.mark.parametrize("extra_options", ["", "--update", "--lock", "--check"])
 def test_dry_run_flag_prevents_changes(
     extra_options: str,
     seeded_relax_command: CommandTester,
@@ -381,7 +381,7 @@ def test_dry_run_flag_prevents_changes(
         new_cloudpickle_version == seeded_cloudpickle_version
     ), f"The dependency should not be upgraded but has version {new_cloudpickle_version}"
 
-    if "--no-check" not in extra_options:
+    if "--check" in extra_options:
         assert_io_contains(
             "Checking dependencies for relaxable constraints", seeded_relax_command.io
         )
@@ -399,7 +399,7 @@ def test_python_dependency_is_ignored(relax_command: CommandTester):
         config["tool"]["poetry"]["dependencies"]["python"] = "^3.8"
 
     with assert_pyproject_unchanged():
-        relax_command.execute()
+        relax_command.execute("--check")
 
     assert relax_command.status_code == 0
 
@@ -417,7 +417,7 @@ def test_invoked_from_subdirectory(
     with assert_pyproject_matches() as expected_config:
         # Change directories for execution of the package
         with tmpchdir(child_dir):
-            relax_command.execute("--no-check")
+            relax_command.execute()
 
         expected_config["tool"]["poetry"]["dependencies"]["test"] = ">=1.0"
 

@@ -42,13 +42,19 @@ Relax constraints for which Poetry set an upper version:
 $ poetry relax
 ```
 
-Relax constraints and update packages:
+Relax constraints and check that they are resolvable without performing upgrades:
+
+```bash
+$ poetry relax --check
+```
+
+Relax constraints and upgrade packages:
 
 ```bash
 $ poetry relax --update
 ```
 
-Relax constraints and update the lock file:
+Relax constraints and update the lock file without upgrading packages:
 
 ```bash
 $ poetry relax --lock

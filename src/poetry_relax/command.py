@@ -37,10 +37,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
         option(
             "dry-run",
             None,
-            description=(
-                "Output the operations but do not execute anything "
-                "(implicitly enables --verbose)."
-            ),
+            description=("Output the operations but do not execute anything."),
         ),
         option(
             "lock",
@@ -48,10 +45,11 @@ class RelaxCommand(InitCommand, InstallerCommand):
             description="Run a lock file update after changing the constraints.",
         ),
         option(
-            "no-check",
+            "check",
             None,
             description=(
-                "Do not check if versions are valid after changing the constraints."
+                "Check if versions are valid after changing the constraints by running "
+                "the Poetry solver."
             ),
         ),
         option(
@@ -71,8 +69,6 @@ class RelaxCommand(InitCommand, InstallerCommand):
         # The following implemention relies heavily on internal Poetry objects and
         # is based on the `poetry add` implementation which is available under the MIT
         # license.
-
-        should_check = not self.option("no-check")
 
         # Read poetry file as a dictionary
         if self.io.is_verbose():
@@ -126,7 +122,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
             self.line(f"Proposing updates to {len(updated_dependencies)} dependencies.")
 
         # Validate that the update is valid by running the installer
-        if self.option("update") or should_check:
+        if self.option("update") or self.option("check") or self.option("lock"):
             if self.io.is_verbose():
                 for old_constraint, dependency in updated_dependencies:
                     self.info(
@@ -173,7 +169,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
             else:
                 self.line("Dependency check successful.")
         else:
-            if not should_check:
+            if not self.option("check"):
                 self.info("Skipping check for valid versions.")
 
             status = 0

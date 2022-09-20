@@ -36,7 +36,7 @@ jobs:
 
       - name: Relax constraints
         run: |
-          poetry relax
+          poetry relax --check
 
       - name: Publish to Test PyPI
         id: build
