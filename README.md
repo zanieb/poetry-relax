@@ -60,7 +60,7 @@ Relax constraints and update the lock file without upgrading packages:
 $ poetry relax --lock
 ```
 
-See what dependencies would be relaxed without updating the `pyproject.toml`:
+Preview the changes `poetry relax` would make without modifying the project:
 
 ```bash
 $ poetry relax --dry-run
@@ -96,6 +96,10 @@ This plugin will only relax constraints specified with a caret (`^`). Upper cons
 > Is this plugin stable?
 
 This plugin is brand new! Poetry just added their plugin system recently. Efforts will be made to avoid changes in behavior, but it'll be valuable to gather feedback on this plugin in its early stages before releasing a stable version. However, the test suite is thorough and common cases should be well covered.
+
+> Will this plugin drop the upper bound on Python itself?
+
+Believe it or not, this is an even more contentious subset of this issue as Poetry will not allow packages with no upper bound on Python to exist alongside those that include one. This basically means that we cannot relax this requirement without breaking the vast majority of use-cases. For this reason, we cannot relax `python^3` at this time. See [the the post on the Poetry discussion board](https://github.com/python-poetry/poetry/discussions/3757#discussioncomment-435345) for more details.
 
 ## Contributing
 
@@ -138,5 +142,6 @@ Content from some members of the Python core developer team:
 - [Versioning Software](https://caremad.io/posts/2016/02/versioning-software/)
 
 Discussion and issues in the Poetry project:
+- [Please stop pinning to major versions by default, especially for Python itself](https://github.com/python-poetry/poetry/issues/3747)
 - [Change default dependency constraint from ^ to >=](https://github.com/python-poetry/poetry/issues/3427)
 - [Developers should be able to turn off dependency upper-bound calculations](https://github.com/python-poetry/poetry/issues/2731)
