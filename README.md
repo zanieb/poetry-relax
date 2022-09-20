@@ -1,11 +1,9 @@
-# Poetry Relax
+# poetry-relax
 
-A [Poetry](https://github.com/python-poetry/poetry) plugin to relax dependency version pins for your Python projects.
-
-Relax your library's dependencies from `foobar^2.0.0` to `foobar>=2.0.0`.
+A [Poetry](https://github.com/python-poetry/poetry) plugin to relax dependency versions when publishign libraries. Relax dependencies from `foobar^2.0.0` to `foobar>=2.0.0`.
 
 By default, Poetry uses caret constraints which would limit `foobar` versions to `<3.0`.
-`poetry relax` removes these upper version bounds, allowing dependencies to be upgraded.
+**poetry-relax**  removes these upper version bounds, allowing dependencies to be upgraded.
 
 Removing upper version bounds is important when publishing libraries.
 When searching for versions of dependencies to install, the resolver (e.g. `pip`) must respect the bounds your library specifies.
@@ -17,9 +15,9 @@ By removing upper version bounds from your library, control is returned to the u
 
 Poetry's default behavior is to include upper version bounds. Many people have spoken up against this style of dependency management in the Python ecosystem, including members of the Python core development team. See [the bottom of the readme](#references) for links and additional context.
 
-Since the Poetry project will not allow this behavior to be configured, maintainers have resorted to manual editing of dependency constraints after adding. `poetry relax` aims to automate and simplify this process.
+Since the Poetry project will not allow this behavior to be configured, maintainers have resorted to manual editing of dependency constraints after adding. **poetry-relax** aims to automate and simplify this process.
 
-`poetry relax` provides:
+**poetry-relax** provides:
 - Automated removal of upper bound constraints specified with `^`
 - Safety check if package requirements are still solvable after relaxing constraints
 - Upgrade of dependencies after relaxing constraints
