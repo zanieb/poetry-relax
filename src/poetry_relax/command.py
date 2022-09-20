@@ -135,6 +135,8 @@ class RelaxCommand(InitCommand, InstallerCommand):
             )
             if should_not_update:
                 self.info("Checking new dependencies can be solved...")
+            else:
+                self.info("Running Poetry package installer...")
 
             # Cosmetic new line
             self.line("")
@@ -167,7 +169,8 @@ class RelaxCommand(InitCommand, InstallerCommand):
                 self.line(str(exc), style="fg=red;options=bold")
                 status = 1
             else:
-                self.line("Dependency check successful.")
+                if self.option("check"):
+                    self.line("\nDependency check successful.")
         else:
             if not self.option("check"):
                 self.info("Skipping check for valid versions.")
