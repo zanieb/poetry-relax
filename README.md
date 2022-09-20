@@ -60,6 +60,12 @@ Relax constraints and update the lock file without upgrading packages:
 $ poetry relax --lock
 ```
 
+See what dependencies would be relaxed without updating the `pyproject.toml`:
+
+```bash
+$ poetry relax --dry-run
+```
+
 ## Examples
 
 The behavior of Poetry is quite reasonable for local development! `poetry relax` is most useful when used in CI/CD pipelines.
