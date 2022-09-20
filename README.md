@@ -118,15 +118,15 @@ $ ./bin/lint fix .
 There's a lot to read on this topic! It's contentious and causing a lot of problems for maintainers and users.
 
 The following blog posts by Henry Schreiner are quite comprehensive:
-- https://iscinumpy.dev/post/bound-version-constraints/
-- https://iscinumpy.dev/post/poetry-versions/
+- [Should You Use Upper Bound Version Constraints?](https://iscinumpy.dev/post/bound-version-constraints/)
+- [Poetry Versions](https://iscinumpy.dev/post/poetry-versions/)
 
 Content from some members of the Python core developer team:
-- https://hynek.me/articles/semver-will-not-save-you/
-- https://snarky.ca/why-i-dont-like-semver/
-- https://bernat.tech/posts/version-numbers/
-- https://caremad.io/posts/2016/02/versioning-software/
+- [Semantic Versioning Will Not Save You](https://hynek.me/articles/semver-will-not-save-you/)
+- [Why I don't like SemVer anymore](https://snarky.ca/why-i-dont-like-semver/)
+- [Version numbers: how to use them?](https://bernat.tech/posts/version-numbers/)
+- [Versioning Software](https://caremad.io/posts/2016/02/versioning-software/)
 
-Issues
-- https://github.com/python-poetry/poetry/issues/3427
-- https://github.com/python-poetry/poetry/issues/2731
+Discussion and issues in the Poetry project:
+- [Change default dependency constraint from ^ to >=](https://github.com/python-poetry/poetry/issues/3427)
+- [Developers should be able to turn off dependency upper-bound calculations](https://github.com/python-poetry/poetry/issues/2731)
