@@ -1,7 +1,7 @@
 from poetry.console.application import Application
 from poetry.plugins.application_plugin import ApplicationPlugin
 
-from poetry_relax.commands import RelaxCommand
+from poetry_relax.command import RelaxCommand
 
 # Plugin registration with Poetry
 
