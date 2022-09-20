@@ -44,5 +44,5 @@ jobs:
         env:
           POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_API_TOKEN }}
         run: |
-          poetry version ${{ github.ref }}
+          poetry version "${GITHUB_REF#refs/*/}"
           poetry publish --build
