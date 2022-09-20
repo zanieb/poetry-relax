@@ -1,6 +1,6 @@
 # poetry-relax
 
-A [Poetry](https://github.com/python-poetry/poetry) plugin to relax dependency versions when publishign libraries. Relax dependencies from `foobar^2.0.0` to `foobar>=2.0.0`.
+A [Poetry](https://github.com/python-poetry/poetry) plugin to relax dependency versions when publishing libraries. Relax your project's dependencies from `foobar^2.0.0` to `foobar>=2.0.0`.
 
 By default, Poetry uses caret constraints which would limit `foobar` versions to `<3.0`.
 **poetry-relax**  removes these upper version bounds, allowing dependencies to be upgraded.
