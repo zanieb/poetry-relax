@@ -76,6 +76,10 @@ jobs:
           | grep --quiet "${{ needs.build-and-publish.outputs.build-version }}";
           do sleep 10;
           done
+          &&
+          sleep 30
+          # We sleep for an additional 30 seconds as it seems to take a bit longer for
+          # the package to be consistently available
 
           # Note: The above will not sleep forever due to the job level timeout
 
