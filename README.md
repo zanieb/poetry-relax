@@ -123,8 +123,8 @@ $ pytest tests
 
 Run linters before opening pull requests:
 ```bash
-$ ./bin/lint check .
-$ ./bin/lint fix .
+$ ./scripts/lint check .
+$ ./scripts/lint fix .
 ```
 
 ## References
