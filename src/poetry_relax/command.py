@@ -34,7 +34,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
             description="The group relax constraints in.",
             flag=False,
             default=[
-                MAIN_GROUP,
+                # MAIN_GROUP,
             ],
             multiple=True,
         ),
@@ -80,8 +80,8 @@ class RelaxCommand(InitCommand, InstallerCommand):
         pyproject_config: dict[str, Any] = self.poetry.file.read()
         poetry_config = pyproject_config["tool"]["poetry"]
 
-        # Load dependencies in the given group
-        groups = self.option("group")
+        # Load dependencies in the given groups
+        groups = self.option("group") or self.default_groups
 
         for group in groups:
             pretty_group = (
