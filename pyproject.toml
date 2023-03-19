@@ -1,3 +1,8 @@
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
 [tool.poetry]
 name = "poetry-relax"
 version = "0.0.0"
@@ -30,9 +35,6 @@ classifiers = [
 python = "^3.7"
 poetry = ">=1.2"
 
-[tool.poetry.plugins."poetry.application.plugin"]
-relax = "poetry_relax:RelaxPlugin"
-
 [tool.poetry.group.dev.dependencies]
 black = ">=7.1.3"
 isort = ">=2.5.0"
@@ -40,6 +42,5 @@ pytest = ">=7.1.3"
 pytest-xdist = ">=2.5.0"
 mypy = ">=0.971"
 
-[build-system]
-requires = ["poetry-core"]
-build-backend = "poetry.core.masonry.api"
+[tool.poetry.plugins."poetry.application.plugin"]
+relax = "poetry_relax:RelaxPlugin"
