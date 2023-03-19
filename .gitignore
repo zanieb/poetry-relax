@@ -27,6 +27,8 @@
 # exclude actual virtual-environment
 /.venv/
 
-# excluded generated python-files
+# exclude toplevel var-dir
+/var/
+
+# exclude generated python-directories
 __pycache__/
-# *.pyc

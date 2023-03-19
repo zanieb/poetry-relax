@@ -44,3 +44,8 @@ mypy = ">=0.971"
 
 [tool.poetry.plugins."poetry.application.plugin"]
 relax = "poetry_relax:RelaxPlugin"
+
+[tool.pytest.ini_options]
+addopts = "--junit-xml='var/coverage/pytest.xml'"
+cache_dir = "var/cache/pytest"
+testpaths = ["tests"]
