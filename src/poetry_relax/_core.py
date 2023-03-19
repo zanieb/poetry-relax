@@ -1,4 +1,5 @@
-"""
+"""poetry_relax._core.
+
 Core utilities for the `poetry relax` functionality.
 """
 import contextlib

@@ -1,3 +1,4 @@
+"""poetry_relax.command."""
 from typing import Any
 
 # cleo is not PEP 561 compliant must be ignored

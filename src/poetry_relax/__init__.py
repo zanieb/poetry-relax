@@ -1,3 +1,4 @@
+"""poetry_relax.__init__."""
 from poetry.console.application import Application
 from poetry.plugins.application_plugin import ApplicationPlugin
 
