@@ -3,6 +3,14 @@
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
 
+
+[tool.black]
+line-length = 88
+
+[tool.isort]
+line_length = 88  # corresponds to -w  flag
+profile = "black"
+
 [tool.mypy]
 cache_dir = "var/cache/mypy"
 mypy_path = ["src", "tests"]
