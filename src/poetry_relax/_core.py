@@ -27,16 +27,21 @@ OR_CONSTRAINT_SEPARATORS = re.compile(r"(\s*\|\|?\s*)")
 
 @contextlib.contextmanager
 def patch_io_writes(io: "IO", patch_function: Callable):
+    """
+    Patches writes to the given IO object to call the `patch_function`.
+    """
     write_line = io.write_line
     write = io.write
-    io.write_line = functools.partial(patch_function, write_line)
-    io.write = functools.partial(patch_function, write)
+
+    # See https://github.com/python/mypy/issues/708 for method override type ignores
+    io.write_line = functools.partial(patch_function, write_line)  # type: ignore
+    io.write = functools.partial(patch_function, write)  # type: ignore
 
     try:
         yield
     finally:
-        io.write_line = write_line
-        io.write = write
+        io.write_line = write_line  # type: ignore
+        io.write = write  # type:ignore
 
 
 def run_installer_update(
