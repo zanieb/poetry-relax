@@ -1,7 +1,7 @@
 name: Lint
 
 env:
-  POETRY_VERSION: "1.2.0"
+  POETRY_VERSION: "1.4.1"
 
 on:
   pull_request:
