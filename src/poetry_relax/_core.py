@@ -7,7 +7,13 @@ import re
 from copy import copy
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional
 
-from poetry.core.constraints.version import VersionRange
+import pkg_resources
+
+if pkg_resources.get_distribution("poetry").version.startswith("1.2."):
+    from poetry.core.semver.version_range import VersionRange
+else:
+    from poetry.core.constraints.version import VersionRange
+
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 if TYPE_CHECKING:
