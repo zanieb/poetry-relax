@@ -74,7 +74,7 @@ jobs:
 
       - name: Set up Poetry
         run: |
-          pip install poetry${{ matrix.poetry-version }}
+          pip install "poetry${{ matrix.poetry-version }}"
 
       - name: Install packages
         run: |
