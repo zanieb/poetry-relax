@@ -76,10 +76,11 @@ jobs:
         run: |
           pip install "poetry~=${{ matrix.poetry-version }}"
 
+          # Ensure that Poetry is not upgraded past the version we are testing
+          poetry add "poetry@~${{ matrix.poetry-version }}" --lock
+
       - name: Install packages
         run: |
-          # Ensure that Poetry is not upgraded past the version we are testing
-          poetry add "poetry@~${{ matrix.poetry-version }}"
           poetry install
 
       - name: Relax constraints
