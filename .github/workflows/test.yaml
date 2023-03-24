@@ -76,6 +76,9 @@ jobs:
         run: |
           pip install "poetry${{ matrix.poetry-version }}"
 
+          # Ensure the lock file is valid for this version of poetry
+          poetry lock --no-update
+
       - name: Install packages
         run: |
           poetry install
