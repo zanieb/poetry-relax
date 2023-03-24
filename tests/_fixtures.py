@@ -133,7 +133,6 @@ def poetry_project_path(base_poetry_project_path: Path, tmp_path: Path) -> Path:
 def seeded_base_poetry_project_path(
     base_poetry_project_path: Path, seeded_cloudpickle_version
 ) -> Path:
-
     with tempfile.TemporaryDirectory(prefix="poetry-relax-test-seeded-base") as tmpdir:
         seeded_base = Path(tmpdir).resolve() / "seeded-base"
 
