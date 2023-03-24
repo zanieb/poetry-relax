@@ -8,7 +8,7 @@ from copy import copy
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional
 
 from poetry.core.packages.dependency_group import MAIN_GROUP
-from poetry.core.semver.version_range import VersionRange
+from poetry.core.constraints.version import VersionRange
 
 if TYPE_CHECKING:
     # See https://github.com/python-poetry/cleo/pull/254 for ignore
