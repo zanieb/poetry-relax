@@ -74,7 +74,7 @@ jobs:
 
       - name: Install Poetry ${{ matrix.poetry-version }}
         run: |
-          pip install "poetry~=${{ matrix.poetry-version }}"
+          pip install "poetry~=${{ matrix.poetry-version }}.0"
 
           # Ensure that Poetry is not upgraded past the version we are testing
           poetry add "poetry@~${{ matrix.poetry-version }}" --lock
