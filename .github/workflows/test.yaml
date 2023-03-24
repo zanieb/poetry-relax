@@ -5,7 +5,6 @@ env:
   # https://github.com/pytest-dev/pytest/issues/7443
   # https://github.com/actions/runner/issues/241
   PY_COLORS: 1
-  POETRY_BOOTSTRAP_VERSION: "1.4.1"
 
 on:
   pull_request:
@@ -73,21 +72,18 @@ jobs:
           # TODO: This appears to require poetry to be installed before usage
           # cache: "poetry"
 
-      - name: Install Poetry for boostrapping
+      - name: Install Poetry ${{ matrix.poetry-version }}
         run: |
-          pip install "poetry==${{ env.POETRY_BOOTSTRAP_VERSION }}"
+          pip install "poetry~=${{ matrix.poetry-version }}"
 
       - name: Install packages
         run: |
           poetry install
 
-      - name: Install Poetry ${{ matrix.poetry-version }} for testing
-        run: |
-          poetry add "poetry@~${{ matrix.poetry-version }}"
-
       - name: Relax constraints
         if: ${{ matrix.relax }}
         run: |
+          # Install the plugin
           poetry self add $(pwd)
           poetry relax --update
 
