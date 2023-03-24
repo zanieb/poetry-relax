@@ -96,7 +96,7 @@ def base_poetry_project_path(
             env_manager = EnvManager(application.poetry)
             env = env_manager.create_venv(
                 application.create_io(),
-                f"{sys.version_info[0]}.{sys.version_info[1]}",
+                sys.executable,
                 # Force required to create it despite tests generally being run inside a
                 # virtual environment
                 force=True,
