@@ -57,7 +57,7 @@ def seeded_relax_command(
 
     # Assert that the update above was successful
     assert check_paths_relative(
-        relax_command.command.poetry.file, seeded_poetry_project_path
+        relax_command.command.poetry.file.path, seeded_poetry_project_path
     ), f"""
         The poetry application's config file should be relative to the test project path:
             {seeded_poetry_project_path}
