@@ -7,8 +7,8 @@ import re
 from copy import copy
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional
 
-from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.core.constraints.version import VersionRange
+from poetry.core.packages.dependency_group import MAIN_GROUP
 
 if TYPE_CHECKING:
     # See https://github.com/python-poetry/cleo/pull/254 for ignore
@@ -155,7 +155,6 @@ def mutate_constraint(constraints: str, callback: Callable[[str], str]) -> str:
     # We need to retain these for joining the string after callbacks are performed
     # It's easiest to just mutate the lists rather than performing fancy zips
     for i in range(0, len(or_constraints), 2):
-
         # Parse _and_ expressions
         and_constraints = re.split(
             AND_CONSTRAINT_SEPARATORS,
