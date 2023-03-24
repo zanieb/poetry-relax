@@ -69,7 +69,7 @@ def run_installer_update(
         group.add_dependency(dependency)
 
     # Refresh the locker
-    poetry.set_locker(poetry.locker.__class__(poetry.locker.lock.path, poetry_config))
+    poetry.set_locker(poetry.locker.__class__(poetry.locker.lock, poetry_config))
     installer.set_locker(poetry.locker)
 
     installer.set_package(poetry.package)
