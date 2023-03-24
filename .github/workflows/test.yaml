@@ -32,7 +32,7 @@ concurrency:
 
 jobs:
   python-tests:
-    name: Python tests
+    name: Python ${{ matrix.python-version }}, Poetry ${{ matrix.poetry-version}}
 
     strategy:
       matrix:
