@@ -78,6 +78,8 @@ jobs:
 
       - name: Install packages
         run: |
+          # Ensure that Poetry is not upgraded past the version we are testing
+          poetry add "poetry@~${{ matrix.poetry-version }}"
           poetry install
 
       - name: Relax constraints
