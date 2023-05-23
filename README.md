@@ -87,6 +87,13 @@ Relax constraints for specific dependency groups:
 $ poetry relax --only foo --only bar
 ```
 
+Relax constraints excluding specific dependency groups:
+
+```bash
+$ poetry relax --without foo --without bar
+```
+
+
 ## Examples
 
 The behavior of Poetry is quite reasonable for local development! `poetry relax` is most useful when used in CI/CD pipelines.
