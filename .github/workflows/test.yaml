@@ -55,6 +55,11 @@ jobs:
           - python-version: "3.12-dev"
             relax: true
 
+        exclude:
+          # Poetry 1.2 has compatibility issues with 3.12
+          - python-version: "3.12-dev"
+            poetry-version: "1.2"
+
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
