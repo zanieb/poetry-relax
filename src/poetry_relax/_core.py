@@ -38,11 +38,11 @@ else:
 
 if POETRY_VERSION < packaging.version.Version("1.3.0"):
     # Poetry 1.2.x defined a different name for Cleo 1.x
-    from poetry.console.exceptions import (
+    from poetry.console.exceptions import (  # type: ignore
         PoetrySimpleConsoleException as PoetryConsoleError,
     )
 else:
-    from poetry.console.exceptions import PoetryConsoleError
+    from poetry.console.exceptions import PoetryConsoleError  # noqa: F401
 
 
 # Regular expressions derived from `poetry.core.semver.helpers.parse_constraint`

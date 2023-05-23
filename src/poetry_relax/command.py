@@ -112,7 +112,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
 
         # Validate given groups using Poetry's internal handler
         self._validate_group_options(
-            {opt: (self.option(opt) or []) for opt in {"only", "without", "group"}}
+            {opt: (self.option(opt) or set()) for opt in {"only", "without", "group"}}
         )
 
         groups = cast(List[str], self._get_only_group_option()) or list(
