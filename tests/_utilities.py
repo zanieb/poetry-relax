@@ -16,8 +16,8 @@ from poetry.utils.env import EnvManager
 
 from poetry_relax._core import POETRY_VERSION
 
-if POETRY_VERSION < packaging.version.Version("1.5.0"):
-    # Poetry 1.4.x and earlier defined a different name for Cleo 1.x
+if POETRY_VERSION < packaging.version.Version("1.3.0"):
+    # Poetry 1.2.x defined a different name for Cleo 1.x
     from poetry.console.exceptions import (
         PoetrySimpleConsoleException as PoetryConsoleError,
     )
