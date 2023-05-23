@@ -14,16 +14,7 @@ from poetry.console.application import Application as PoetryApplication
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.utils.env import EnvManager
 
-from poetry_relax._core import POETRY_VERSION
-
-if POETRY_VERSION < packaging.version.Version("1.3.0"):
-    # Poetry 1.2.x defined a different name for Cleo 1.x
-    from poetry.console.exceptions import (
-        PoetrySimpleConsoleException as PoetryConsoleError,
-    )
-else:
-    from poetry.console.exceptions import PoetryConsoleError
-
+from poetry_relax._core import PoetryConsoleError
 
 PYPROJECT = "pyproject.toml"
 LOCKFILE = "poetry.lock"
