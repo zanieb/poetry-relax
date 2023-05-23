@@ -6,11 +6,11 @@ from pathlib import Path
 from typing import Any, Dict, Generator, Union
 
 import tomlkit
-from poetry.console.exceptions import PoetryConsoleError
 from cleo.commands.command import Command
 from cleo.io.outputs.output import Verbosity
 from cleo.testers.command_tester import CommandTester as _CommandTester
 from poetry.console.application import Application as PoetryApplication
+from poetry.console.exceptions import PoetryConsoleError
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.utils.env import EnvManager
 

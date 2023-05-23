@@ -1,4 +1,4 @@
-from typing import Any
+from typing import Any, List, cast
 
 # cleo is not PEP 561 compliant must be ignored
 # See https://github.com/python-poetry/cleo/pull/254
@@ -6,7 +6,6 @@ from cleo.helpers import option  # type: ignore
 from poetry.console.commands.init import InitCommand
 from poetry.console.commands.installer_command import InstallerCommand
 from poetry.core.factory import Factory
-from poetry.core.packages.dependency_group import MAIN_GROUP
 from tomlkit.toml_document import TOMLDocument
 
 from poetry_relax._core import (
@@ -84,7 +83,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
         pyproject_config: dict[str, Any] = self.poetry.file.read()
         poetry_config = pyproject_config["tool"]["poetry"]
 
-        groups = self.option("group") or list(
+        groups = cast(List[str], self.option("group")) or list(
             # Use all groups by default, including optional groups
             sorted(self.poetry.package.dependency_group_names(include_optional=True))
         )
@@ -93,7 +92,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
             return 1
 
         # Validate the groups using Poetry's internal handler
-        self._validate_group_options({"group": groups})
+        self._validate_group_options({"group": set(groups)})
 
         updated_dependencies = {}  # Dependencies updated per group
 
@@ -109,8 +108,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
             )
             if dependency_config is None:
                 self.line(f"No dependencies found{pretty_group}.")
-                # Return a bad status code as the user likely provided a bad group
-                return 1
+                continue
 
             # Parse the dependencies
             target_dependencies = [
@@ -220,6 +218,9 @@ class RelaxCommand(InitCommand, InstallerCommand):
             dependency_config = extract_dependency_config_for_group(
                 group, poetry_config
             )
+            if dependency_config is None:
+                continue
+
             for old_constraint, dependency in updated_dependencies[group]:
                 # Mutate the dependency config (and consequently the pyproject config)
                 name = dependency.name
