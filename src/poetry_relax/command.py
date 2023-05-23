@@ -12,18 +12,11 @@ from tomlkit.toml_document import TOMLDocument
 
 from poetry_relax._core import (
     POETRY_VERSION,
+    PoetryConsoleError,
     drop_caret_bound_from_dependency,
     extract_dependency_config_for_group,
     run_installer_update,
 )
-
-if POETRY_VERSION < Version("1.3.0"):
-    # Poetry 1.2.x defined a different name for Cleo 1.x
-    from poetry.console.exceptions import (
-        PoetrySimpleConsoleException as PoetryConsoleError,
-    )
-else:
-    from poetry.console.exceptions import PoetryConsoleError
 
 
 def _pretty_group(group: str) -> str:
@@ -117,6 +110,11 @@ class RelaxCommand(InitCommand, InstallerCommand):
         pyproject_config: dict[str, Any] = self.poetry.file.read()
         poetry_config = pyproject_config["tool"]["poetry"]
 
+        # Validate given groups using Poetry's internal handler
+        self._validate_group_options(
+            {opt: (self.option(opt) or []) for opt in {"only", "without", "group"}}
+        )
+
         groups = cast(List[str], self._get_only_group_option()) or list(
             # Use all groups by default, including optional groups
             sorted(self.poetry.package.dependency_group_names(include_optional=True))
@@ -124,9 +122,6 @@ class RelaxCommand(InitCommand, InstallerCommand):
         if not groups:
             self.info("No groups specified.")
             return 1
-
-        # Validate the groups using Poetry's internal handler
-        self._validate_group_options({"group": set(groups)})
 
         updated_dependencies = {}  # Dependencies updated per group
 

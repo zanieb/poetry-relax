@@ -9,6 +9,14 @@ from copy import copy
 from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Optional
 
 import packaging.version
+from poetry.core.packages.dependency_group import MAIN_GROUP
+
+if TYPE_CHECKING:
+    # See https://github.com/python-poetry/cleo/pull/254 for ignore
+    from cleo.io.io import IO  # type: ignore
+    from poetry.core.packages.dependency import Dependency
+    from poetry.installation.installer import Installer
+    from poetry.poetry import Poetry
 
 if sys.version_info < (3, 8):  # Python 3.7 support
     import pkg_resources
@@ -27,14 +35,15 @@ if POETRY_VERSION < packaging.version.Version("1.3.0"):
 else:
     from poetry.core.constraints.version import VersionRange
 
-from poetry.core.packages.dependency_group import MAIN_GROUP
 
-if TYPE_CHECKING:
-    # See https://github.com/python-poetry/cleo/pull/254 for ignore
-    from cleo.io.io import IO  # type: ignore
-    from poetry.core.packages.dependency import Dependency
-    from poetry.installation.installer import Installer
-    from poetry.poetry import Poetry
+if POETRY_VERSION < packaging.version.Version("1.3.0"):
+    # Poetry 1.2.x defined a different name for Cleo 1.x
+    from poetry.console.exceptions import (
+        PoetrySimpleConsoleException as PoetryConsoleError,
+    )
+else:
+    from poetry.console.exceptions import PoetryConsoleError
+
 
 # Regular expressions derived from `poetry.core.semver.helpers.parse_constraint`
 # These are used to parse complex constraint strings into single constraints
