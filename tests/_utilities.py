@@ -5,14 +5,25 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Dict, Generator, Optional, Union
 
+import packaging.version
 import tomlkit
 from cleo.commands.command import Command
 from cleo.io.outputs.output import Verbosity
 from cleo.testers.command_tester import CommandTester as _CommandTester
 from poetry.console.application import Application as PoetryApplication
-from poetry.console.exceptions import PoetryConsoleError
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.utils.env import EnvManager
+
+from poetry_relax._core import POETRY_VERSION
+
+if POETRY_VERSION < packaging.version.Version("1.5.0"):
+    # Poetry 1.4.x and earlier defined a different name for Cleo 1.x
+    from poetry.console.exceptions import (
+        PoetrySimpleConsoleException as PoetryConsoleError,
+    )
+else:
+    from poetry.console.exceptions import PoetryConsoleError
+
 
 PYPROJECT = "pyproject.toml"
 LOCKFILE = "poetry.lock"
