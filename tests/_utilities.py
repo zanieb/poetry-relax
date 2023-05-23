@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 from contextlib import contextmanager
@@ -7,7 +6,12 @@ from pathlib import Path
 from typing import Any, Dict, Generator, Union
 
 import tomlkit
+from cleo.commands.command import Command
+from cleo.io.outputs.output import Verbosity
+from cleo.testers.command_tester import CommandTester as _CommandTester
+from poetry.console.application import Application as PoetryApplication
 from poetry.core.packages.dependency_group import MAIN_GROUP
+from poetry.utils.env import EnvManager
 
 PYPROJECT = "pyproject.toml"
 LOCKFILE = "poetry.lock"
@@ -139,3 +143,38 @@ if sys.version_info < (3, 9):
 
 else:
     check_paths_relative = Path.is_relative_to
+
+
+class PoetryCommandTester(_CommandTester):
+    def __init__(self, command: Command, application: PoetryApplication) -> None:
+        super().__init__(command)
+        self.configure_for_application(application)
+
+    def configure_for_application(self, application: PoetryApplication):
+        self._application = application
+        application.add(self.command)
+
+        manager = EnvManager(poetry=application.poetry)
+        env = manager.get(reload=True)
+
+        # The following is necessary to set up the command and is usually handled by
+        # poetry.console.application.Application.__init__ on command dispatch. The
+        # tester appears to bypass these handlers so we duplicate the setup here
+        self.command.set_env(env)
+        application.configure_installer_for_command(self.command, self.io)
+
+    def execute(
+        self,
+        args: str = "",
+        inputs: str | None = None,
+        interactive: bool | None = None,
+        verbosity: Verbosity | None = None,
+        decorated: bool | None = None,
+        supports_utf8: bool = True,
+    ) -> int:
+        # Reload the application to ensure that project changes are reflected
+        self._application.reset_poetry()
+
+        return super().execute(
+            args, inputs, interactive, verbosity, decorated, supports_utf8
+        )
