@@ -164,6 +164,48 @@ def test_single_dependency_updated_in_group(relax_command: PoetryCommandTester):
     assert relax_command.status_code == 0
 
 
+def test_single_dependency_updated_in_multiple_groups(
+    relax_command: PoetryCommandTester,
+):
+    with update_pyproject() as config:
+        get_dependency_group(config)["test"] = "^1.0"
+        get_dependency_group(config, "foo")["test"] = "^2.0"
+        get_dependency_group(config, "bar")["test"] = "^3.0"
+
+        # Cover inclusion of optional groups
+        config["tool"]["poetry"]["group"]["bar"]["optional"] = True
+
+    with assert_pyproject_matches() as expected_config:
+        relax_command.execute()
+
+        get_dependency_group(expected_config)["test"] = ">=1.0"
+        get_dependency_group(expected_config, "foo")["test"] = ">=2.0"
+        get_dependency_group(expected_config, "bar")["test"] = ">=3.0"
+
+    assert relax_command.status_code == 0
+
+
+def test_multiple_dependencies_updated_in_multiple_groups(
+    relax_command: PoetryCommandTester,
+):
+    with update_pyproject() as config:
+        get_dependency_group(config)["a"] = "^1.0"
+        get_dependency_group(config, "foo")["b"] = "^2.0"
+        get_dependency_group(config, "bar")["c"] = "^3.0"
+
+        # Cover inclusion of optional groups
+        config["tool"]["poetry"]["group"]["bar"]["optional"] = True
+
+    with assert_pyproject_matches() as expected_config:
+        relax_command.execute()
+
+        get_dependency_group(expected_config)["a"] = ">=1.0"
+        get_dependency_group(expected_config, "foo")["b"] = ">=2.0"
+        get_dependency_group(expected_config, "bar")["c"] = ">=3.0"
+
+    assert relax_command.status_code == 0
+
+
 @pytest.mark.parametrize(
     "input_version,output_version",
     [
@@ -245,13 +287,15 @@ def test_dependency_updated_with_validity_check(
     seeded_project_venv: VirtualEnv,
     seeded_cloudpickle_version: str,
 ):
-    with update_pyproject() as pyproject:
-        pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
+    with update_pyproject() as config:
+        config["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
+        get_dependency_group(config, "dev")["cloudpickle"] = "^1.0"
 
     with assert_pyproject_matches() as expected_config:
         seeded_relax_command.execute("--check")
 
         expected_config["tool"]["poetry"]["dependencies"]["cloudpickle"] = ">=1.0"
+        get_dependency_group(expected_config, "dev")["cloudpickle"] = ">=1.0"
 
     assert seeded_relax_command.status_code == 0
     new_cloudpickle_version = seeded_project_venv.run_python_script(
@@ -268,6 +312,9 @@ def test_dependency_relax_aborted_when_constraint_is_not_satisfiable(
     with update_pyproject() as pyproject:
         # Configure the pyproject with a version that does not exist
         pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^999.0"
+
+        # Configure a valid version in another group — should not be relaxed
+        get_dependency_group(pyproject, "dev")["cloudpickle"] = "^1.0"
 
     with assert_pyproject_unchanged():
         seeded_relax_command.execute("--check")
@@ -286,6 +333,9 @@ def test_dependency_relax_aborted_when_package_does_not_exist(
 
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"][fake_name] = "^1.0"
+
+        # Configure a valid dependency in another group — should not be relaxed
+        get_dependency_group(pyproject, "dev")["cloudpickle"] = "^1.0"
 
     with assert_pyproject_unchanged():
         seeded_relax_command.execute("--check")
