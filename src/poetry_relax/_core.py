@@ -6,7 +6,7 @@ import functools
 import re
 import sys
 from copy import copy
-from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional
+from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Optional
 
 import packaging.version
 
@@ -66,8 +66,7 @@ def patch_io_writes(io: "IO", patch_function: Callable):
 def run_installer_update(
     poetry: "Poetry",
     installer: "Installer",
-    dependencies: Iterable["Dependency"],
-    dependency_group_name: str,
+    dependencies_by_group: Dict[str, Iterable["Dependency"]],
     poetry_config: dict,
     dry_run: bool,
     lockfile_only: bool,
@@ -77,25 +76,27 @@ def run_installer_update(
     """
     Run an installer update.
 
-    Ensures that any existing dependencies in the given group are replaced with the new
+    Ensures that any existing dependencies in the given groups are replaced with the new
     dependencies if their names match.
 
     New dependencies are also whitelisted to be updated during locking.
     """
-    group = poetry.package.dependency_group(dependency_group_name)
 
-    # Ensure if we are given a generator that we can consume it more than once
-    dependencies = list(dependencies)
+    for group_name, dependencies in dependencies_by_group.items():
+        group = poetry.package.dependency_group(group_name)
 
-    for dependency in dependencies:
-        with contextlib.suppress(ValueError):
-            group.remove_dependency(dependency.name)
-        group.add_dependency(dependency)
+        # Ensure if we are given a generator that we can consume it more than once
+        dependencies = list(dependencies)
+
+        for dependency in dependencies:
+            with contextlib.suppress(ValueError):
+                group.remove_dependency(dependency.name)
+            group.add_dependency(dependency)
 
     # Refresh the locker
     poetry.set_locker(poetry.locker.__class__(poetry.locker.lock, poetry_config))
     installer.set_locker(poetry.locker)
-
+    installer.only_groups(dependencies_by_group.keys())
     installer.set_package(poetry.package)
     installer.dry_run(dry_run)
     installer.verbose(verbose)

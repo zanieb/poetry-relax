@@ -16,6 +16,10 @@ from poetry_relax._core import (
 )
 
 
+def _pretty_group(group: str) -> str:
+    return f" in group <c1>{group!r}</c1>"
+
+
 class RelaxCommand(InitCommand, InstallerCommand):
     """
     Implementation of `poetry relax`.
@@ -30,9 +34,13 @@ class RelaxCommand(InitCommand, InstallerCommand):
         option(
             "group",
             "-G",
-            description="The group relax constraints in.",
+            description=(
+                "A group to relax constraints in. If not provided, all groups are used."
+                # If a group is specified, it is treated like the Poetry `--only` flag.
+            ),
             flag=False,
-            default=MAIN_GROUP,
+            default=None,
+            multiple=True,
         ),
         option(
             "dry-run",
@@ -76,59 +84,85 @@ class RelaxCommand(InitCommand, InstallerCommand):
         pyproject_config: dict[str, Any] = self.poetry.file.read()
         poetry_config = pyproject_config["tool"]["poetry"]
 
-        # Load dependencies in the given group
-        group = self.option("group")
-        pretty_group = f" in group <c1>{group!r}</c1>" if group != MAIN_GROUP else ""
-
-        self.info(f"Checking dependencies{pretty_group} for relaxable constraints...")
-
-        dependency_config = extract_dependency_config_for_group(group, poetry_config)
-        if dependency_config is None:
-            self.line(f"No dependencies found{pretty_group}.")
-            # Return a bad status code as the user likely provided a bad group
+        groups = self.option("group") or list(
+            # Use all groups by default, including optional groups
+            sorted(self.poetry.package.dependency_group_names(include_optional=True))
+        )
+        if not groups:
+            self.info("No groups specified.")
             return 1
 
-        # Parse the dependencies
-        target_dependencies = [
-            Factory.create_dependency(name, constraints)
-            for name, constraints in dependency_config.items()
-            if name != "python"
-        ]
+        # Validate the groups using Poetry's internal handler
+        self._validate_group_options({"group": groups})
 
-        if not target_dependencies:
-            self.line("No dependencies to relax{pretty_group}.")
-            return 0
+        updated_dependencies = {}  # Dependencies updated per group
 
-        if self.io.is_verbose():
-            self.line(f"Found {len(target_dependencies)} dependencies{pretty_group}.")
+        for group in groups:
+            # Load dependencies in the given group
+            pretty_group = _pretty_group(group)
+            self.info(
+                f"Checking dependencies{pretty_group} for relaxable constraints..."
+            )
 
-        # Construct new dependency objects with the max constraint removed
-        new_dependencies = [
-            drop_caret_bound_from_dependency(d) for d in target_dependencies
-        ]
+            dependency_config = extract_dependency_config_for_group(
+                group, poetry_config
+            )
+            if dependency_config is None:
+                self.line(f"No dependencies found{pretty_group}.")
+                # Return a bad status code as the user likely provided a bad group
+                return 1
 
-        updated_dependencies = [
-            (old.pretty_constraint, new)
-            for old, new in zip(target_dependencies, new_dependencies)
-            # We use the pretty constraint in updates to retain the user's string
-            if old.pretty_constraint != new.pretty_constraint
-        ]
+            # Parse the dependencies
+            target_dependencies = [
+                Factory.create_dependency(name, constraints)
+                for name, constraints in dependency_config.items()
+                if name != "python"
+            ]
 
-        if not updated_dependencies:
+            if not target_dependencies:
+                self.line("No dependencies to relax{pretty_group}.")
+                return 0
+
+            if self.io.is_verbose():
+                self.line(
+                    f"Found {len(target_dependencies)} dependencies{pretty_group}."
+                )
+
+            # Construct new dependency objects with the max constraint removed
+            new_dependencies = [
+                drop_caret_bound_from_dependency(d) for d in target_dependencies
+            ]
+
+            updated_dependencies[group] = [
+                (old.pretty_constraint, new)
+                for old, new in zip(target_dependencies, new_dependencies)
+                # We use the pretty constraint in updates to retain the user's string
+                if old.pretty_constraint != new.pretty_constraint
+            ]
+
+            if self.io.is_verbose():
+                self.line(
+                    f"Proposing updates to {len(updated_dependencies[group])} "
+                    f"dependencies{pretty_group}."
+                )
+
+        updated_count = sum(len(deps) for deps in updated_dependencies.values())
+        if not updated_count:
             self.info("No dependency constraints to relax.")
             return 0
 
-        if self.io.is_verbose():
-            self.line(f"Proposing updates to {len(updated_dependencies)} dependencies.")
+        self.line(f"Proposing updates to {updated_count} dependencies.")
 
         # Validate that the update is valid by running the installer
         if self.option("update") or self.option("check") or self.option("lock"):
             if self.io.is_verbose():
-                for old_constraint, dependency in updated_dependencies:
-                    self.info(
-                        f"Proposing update for <c1>{dependency.name}</> constraint from "
-                        f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
-                    )
+                for group in groups:
+                    for old_constraint, dependency in updated_dependencies[group]:
+                        self.info(
+                            f"Proposing update for <c1>{dependency.name}</> constraint from "
+                            f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
+                            f"{_pretty_group(group)}"
+                        )
 
             should_not_update = self.option("dry-run") or not (
                 self.option("update") or self.option("lock")
@@ -154,8 +188,10 @@ class RelaxCommand(InitCommand, InstallerCommand):
                     poetry=self.poetry,
                     installer=self.installer,
                     lockfile_only=self.option("lock"),
-                    dependencies=(d for _, d in updated_dependencies),
-                    dependency_group_name=group,
+                    dependencies_by_group={
+                        group: (d for _, d in deps)
+                        for group, deps in updated_dependencies.items()
+                    },
                     poetry_config=poetry_config,
                     dry_run=should_not_update,
                     verbose=self.io.is_verbose(),
@@ -180,19 +216,24 @@ class RelaxCommand(InitCommand, InstallerCommand):
         # Cosmetic new line
         self.line("")
 
-        for old_constraint, dependency in updated_dependencies:
-            # Mutate the dependency config (and consequently the pyproject config)
-            name = dependency.name
-            if isinstance(dependency_config[name], dict):
-                dependency_config[name]["version"] = dependency.pretty_constraint
-            else:
-                dependency_config[name] = dependency.pretty_constraint
-
-            # Display the final updates since they can be buried by the installer update
-            self.info(
-                f"Updated <c1>{dependency.pretty_name}</> constraint from "
-                f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
+        for group in groups:
+            dependency_config = extract_dependency_config_for_group(
+                group, poetry_config
             )
+            for old_constraint, dependency in updated_dependencies[group]:
+                # Mutate the dependency config (and consequently the pyproject config)
+                name = dependency.name
+                if isinstance(dependency_config[name], dict):
+                    dependency_config[name]["version"] = dependency.pretty_constraint
+                else:
+                    dependency_config[name] = dependency.pretty_constraint
+
+                # Display the final updates since they can be buried by the installer update
+                self.info(
+                    f"Updated <c1>{dependency.pretty_name}</> constraint from "
+                    f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
+                    f"{_pretty_group(group)}"
+                )
 
         if status == 0 and not self.option("dry-run"):
             assert isinstance(pyproject_config, TOMLDocument)
