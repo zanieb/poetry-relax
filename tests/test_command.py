@@ -87,7 +87,7 @@ def test_newly_initialized_project(
 
 def test_group_does_not_exist(relax_command: PoetryCommandTester):
     with assert_pyproject_unchanged():
-        relax_command.execute("--group iamnotagroup")
+        relax_command.execute("--only iamnotagroup")
 
     assert relax_command.status_code == 1
     assert_io_contains("Group(s) not found: iamnotagroup", relax_command.io)
@@ -157,11 +157,32 @@ def test_single_dependency_updated_in_group(relax_command: PoetryCommandTester):
     relax_command.command.reset_poetry()
 
     with assert_pyproject_matches() as expected_config:
+        relax_command.execute("--only dev")
+
+        get_dependency_group(expected_config, "dev")["test"] = ">=1.0"
+
+    assert relax_command.status_code == 0
+
+
+def test_single_dependency_updated_in_group_with_deprecated_option(
+    relax_command: PoetryCommandTester,
+):
+    # Add test package with pin
+    with update_pyproject() as config:
+        get_dependency_group(config, "dev")["test"] = "^1.0"
+
+    relax_command.command.reset_poetry()
+
+    with assert_pyproject_matches() as expected_config:
+        # Uses `--group` instead of `--only`
         relax_command.execute("--group dev")
 
         get_dependency_group(expected_config, "dev")["test"] = ">=1.0"
 
     assert relax_command.status_code == 0
+    assert_io_contains(
+        "The `--group` option is deprecated; use `--only` instead.", relax_command.io
+    )
 
 
 def test_single_dependency_updated_in_multiple_groups(
@@ -255,7 +276,7 @@ def test_dependency_updated_in_one_group_does_not_affect_other_groups(
         get_dependency_group(config, "bar")["test"] = "^3.0"
 
     with assert_pyproject_matches() as expected_config:
-        relax_command.execute("--group foo")
+        relax_command.execute("--only foo")
 
         get_dependency_group(expected_config)["test"] = "^1.0"
         get_dependency_group(expected_config, "foo")["test"] = ">=2.0"

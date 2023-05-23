@@ -31,8 +31,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
     description = "Relax project dependencies."
     options = [
         option(
-            "group",
-            "-G",
+            "only",
             description=(
                 "A group to relax constraints in. If not provided, all groups are used"
                 "; including optional groups."
@@ -40,6 +39,17 @@ class RelaxCommand(InitCommand, InstallerCommand):
             ),
             flag=False,
             default=None,
+            multiple=True,
+        ),
+        option(
+            "group",
+            "-G",
+            flag=False,
+            default=None,
+            description=(
+                "A group to relax constraints in."
+                " (<warning>Deprecated; use `--only` instead.</warning>)"
+            ),
             multiple=True,
         ),
         option(
@@ -69,6 +79,18 @@ class RelaxCommand(InitCommand, InstallerCommand):
         "carets (<c2>^</>)."
     )
 
+    def _get_only_group_option(self):
+        only = self.option("only")
+        deprecated_groups = self.option("group")
+
+        if deprecated_groups:
+            self.line(
+                "<warning>The `--group` option is deprecated; use `--only` instead."
+                "</warning>"
+            )
+
+        return set(only + deprecated_groups)
+
     def handle(self) -> int:
         """
         The plugin entrypoint for the `poetry relax` command.
@@ -84,7 +106,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
         pyproject_config: dict[str, Any] = self.poetry.file.read()
         poetry_config = pyproject_config["tool"]["poetry"]
 
-        groups = cast(List[str], self.option("group")) or list(
+        groups = cast(List[str], self._get_only_group_option()) or list(
             # Use all groups by default, including optional groups
             sorted(self.poetry.package.dependency_group_names(include_optional=True))
         )
