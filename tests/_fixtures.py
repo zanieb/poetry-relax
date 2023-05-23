@@ -11,18 +11,9 @@ import pytest
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import EnvManager, VirtualEnv
 
+from poetry_relax._core import POETRY_VERSION
+
 from ._utilities import check_paths_relative, tmpchdir
-
-if sys.version_info < (3, 8):  # Python 3.7 support
-    import pkg_resources
-
-    POETRY_VERSION = packaging.version.Version(
-        pkg_resources.get_distribution("poetry").version
-    )
-else:
-    import importlib.metadata as importlib_metadata
-
-    POETRY_VERSION = packaging.version.Version(importlib_metadata.version("poetry"))
 
 
 @pytest.fixture(scope="session")

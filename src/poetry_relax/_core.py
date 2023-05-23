@@ -4,12 +4,25 @@ Core utilities for the `poetry relax` functionality.
 import contextlib
 import functools
 import re
+import sys
 from copy import copy
 from typing import TYPE_CHECKING, Any, Callable, Iterable, Optional
 
-import pkg_resources
+import packaging.version
 
-if pkg_resources.get_distribution("poetry").version.startswith("1.2."):
+if sys.version_info < (3, 8):  # Python 3.7 support
+    import pkg_resources
+
+    POETRY_VERSION = packaging.version.Version(
+        pkg_resources.get_distribution("poetry").version
+    )
+else:
+    import importlib.metadata as importlib_metadata
+
+    POETRY_VERSION = packaging.version.Version(importlib_metadata.version("poetry"))
+
+
+if POETRY_VERSION < packaging.version.Version("1.3.0"):
     from poetry.core.semver.version_range import VersionRange
 else:
     from poetry.core.constraints.version import VersionRange
