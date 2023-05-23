@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, List, cast
+from typing import Any, Dict, List, Set, cast
 
 # cleo is not PEP 561 compliant must be ignored
 # See https://github.com/python-poetry/cleo/pull/254
@@ -277,7 +277,7 @@ class RelaxCommand(InitCommand, InstallerCommand):
 
         return status
 
-    def _validate_group_options(self, group_options: dict[str, set[str]]) -> None:
+    def _validate_group_options(self, group_options: Dict[str, Set[str]]) -> None:
         """
         Raises en error if it detects that a group is not part of pyproject.toml
         """
