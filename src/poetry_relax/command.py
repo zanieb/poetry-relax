@@ -34,7 +34,8 @@ class RelaxCommand(InitCommand, InstallerCommand):
             "group",
             "-G",
             description=(
-                "A group to relax constraints in. If not provided, all groups are used."
+                "A group to relax constraints in. If not provided, all groups are used"
+                "; including optional groups."
                 # If a group is specified, it is treated like the Poetry `--only` flag.
             ),
             flag=False,
