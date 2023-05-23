@@ -1,10 +1,12 @@
 import os
+import re
 import subprocess
 import sys
 import uuid
 from pathlib import Path
 from typing import Callable
 
+import poetry
 import pytest
 from cleo.io.outputs.output import Verbosity
 from cleo.testers.command_tester import CommandTester
@@ -91,7 +93,11 @@ def test_newly_initialized_project(relax_command: CommandTester, extra_options: 
 
 def test_group_does_not_exist(relax_command: CommandTester):
     with assert_pyproject_unchanged():
-        relax_command.execute("--group iamnotagroup")
+        with pytest.raises(
+            poetry.console.exceptions.GroupNotFound,
+            match=re.escape("Group(s) not found: iamnotagroup"),
+        ):
+            relax_command.execute("--group iamnotagroup")
 
     assert relax_command.status_code == 1
     assert_io_contains(
