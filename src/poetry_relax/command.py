@@ -17,6 +17,14 @@ from poetry_relax._core import (
     run_installer_update,
 )
 
+if POETRY_VERSION < Version("1.3.0"):
+    # Poetry 1.2.x defined a different name for Cleo 1.x
+    from poetry.console.exceptions import (
+        PoetrySimpleConsoleException as PoetryConsoleError,
+    )
+else:
+    from poetry.console.exceptions import PoetryConsoleError
+
 
 def _pretty_group(group: str) -> str:
     return f" in group <c1>{group!r}</c1>"
@@ -299,4 +307,4 @@ class RelaxCommand(InitCommand, InstallerCommand):
                     for opt in sorted(invalid_options[group])
                 )
                 message_parts.append(f"{group} (via {opts})")
-            self.line(f"<error>Group(s) not found: {', '.join(message_parts)}</error>")
+            raise PoetryConsoleError(f"Group(s) not found: {', '.join(message_parts)}")
