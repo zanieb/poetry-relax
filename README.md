@@ -1,8 +1,16 @@
 <p align="center">
-    <img alt="Latest version" src="https://img.shields.io/pypi/v/poetry-relax?style=flat-square">
-    <img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/poetry-relax?style=flat-square">
-    <img alt="Test status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/test.yaml?label=test&style=flat-square">
-    <img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/build.yaml?label=build&style=flat-square">
+    <a href="https://pypi.python.org/pypi/poetry-relax/" alt="Latest version">
+        <img alt="Latest version" src="https://img.shields.io/pypi/v/poetry-relax?style=flat-square">
+    </a>
+    <a href="https://devguide.python.org/versions/" alt="Supported Python versions">
+        <img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/poetry-relax?style=flat-square">
+    </a>
+    <a href="https://github.com/madkinsz/poetry-relax/actions/workflows/test.yaml?query=branch%3Amain" alt="Test status">
+        <img alt="Test status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/test.yaml?label=test&style=flat-square">
+    </a>
+    <a href="https://github.com/madkinsz/poetry-relax/actions/workflows/build.yaml?query=branch%3Amain" alt="Build status">
+        <img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/build.yaml?label=build&style=flat-square">
+    </a>
 </p>
 
 # poetry-relax
