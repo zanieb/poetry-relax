@@ -1,14 +1,17 @@
+from collections import defaultdict
 from typing import Any, List, cast
 
 # cleo is not PEP 561 compliant must be ignored
 # See https://github.com/python-poetry/cleo/pull/254
 from cleo.helpers import option  # type: ignore
+from packaging.version import Version
 from poetry.console.commands.init import InitCommand
 from poetry.console.commands.installer_command import InstallerCommand
 from poetry.core.factory import Factory
 from tomlkit.toml_document import TOMLDocument
 
 from poetry_relax._core import (
+    POETRY_VERSION,
     drop_caret_bound_from_dependency,
     extract_dependency_config_for_group,
     run_installer_update,
@@ -273,3 +276,27 @@ class RelaxCommand(InitCommand, InstallerCommand):
             self.info("Skipped update of config file due to dry-run flag.")
 
         return status
+
+    def _validate_group_options(self, group_options: dict[str, set[str]]) -> None:
+        """
+        Raises en error if it detects that a group is not part of pyproject.toml
+        """
+        if POETRY_VERSION >= Version("1.5.0"):
+            return super()._validate_group_options(group_options)
+
+        # Backport of the validation logic from Poetry 1.5.x
+
+        invalid_options = defaultdict(set)
+        for opt, groups in group_options.items():
+            for group in groups:
+                if not self.poetry.package.has_dependency_group(group):
+                    invalid_options[group].add(opt)
+        if invalid_options:
+            message_parts = []
+            for group in sorted(invalid_options):
+                opts = ", ".join(
+                    f"<fg=yellow;options=bold>--{opt}</>"
+                    for opt in sorted(invalid_options[group])
+                )
+                message_parts.append(f"{group} (via {opts})")
+            self.line(f"<error>Group(s) not found: {', '.join(message_parts)}</error>")
