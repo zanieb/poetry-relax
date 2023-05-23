@@ -1,5 +1,12 @@
 # poetry-relax
 
+<p align="center">
+    <img alt="Latest version" src="https://img.shields.io/pypi/v/poetry-relax?style=flat-square">
+    <img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/poetry-relax?style=flat-square">
+    <img alt="Test status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/test.yaml?label=test&style=flat-square">
+    <img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/build.yaml?label=build&style=flat-square">
+</p>
+
 A [Poetry](https://github.com/python-poetry/poetry) plugin to relax dependency versions when publishing libraries. Relax your project's dependencies from `foobar^2.0.0` to `foobar>=2.0.0`.
 
 By default, Poetry uses caret constraints which would limit `foobar` versions to `<3.0`.
