@@ -38,6 +38,7 @@ else:
 
 if POETRY_VERSION < packaging.version.Version("1.3.0"):
     # Poetry 1.2.x defined a different name for Cleo 1.x
+    # isort: off
     from poetry.console.exceptions import (  # type: ignore
         PoetrySimpleConsoleException as PoetryConsoleError,
     )
