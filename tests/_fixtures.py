@@ -6,11 +6,23 @@ import tempfile
 from pathlib import Path
 from typing import Callable
 
+import packaging.version
 import pytest
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import EnvManager, VirtualEnv
 
 from ._utilities import check_paths_relative, tmpchdir
+
+if sys.version_info < (3, 8):  # Python 3.7 support
+    import pkg_resources
+
+    POETRY_VERSION = packaging.version.Version(
+        pkg_resources.get_distribution("poetry").version
+    )
+else:
+    import importlib.metadata as importlib_metadata
+
+    POETRY_VERSION = packaging.version.Version(importlib_metadata.version("poetry"))
 
 
 @pytest.fixture(scope="session")
@@ -94,9 +106,16 @@ def base_poetry_project_path(
         with tmpchdir(tmpdir):
             application = poetry_application_factory()
             env_manager = EnvManager(application.poetry)
+
+            # Poetry expects a `str` in earlier versions
+            if POETRY_VERSION < packaging.version.Version("1.4.0"):
+                executable = sys.executable
+            else:
+                executable = Path(sys.executable)
+
             env = env_manager.create_venv(
                 application.create_io(),
-                Path(sys.executable),
+                executable,
                 # Force required to create it despite tests generally being run inside a
                 # virtual environment
                 force=True,
