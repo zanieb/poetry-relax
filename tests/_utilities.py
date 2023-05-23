@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import Any, Dict, Generator, Union
 
 import tomlkit
+from poetry.console.exceptions import PoetryConsoleError
 from cleo.commands.command import Command
 from cleo.io.outputs.output import Verbosity
 from cleo.testers.command_tester import CommandTester as _CommandTester
@@ -175,6 +176,13 @@ class PoetryCommandTester(_CommandTester):
         # Reload the application to ensure that project changes are reflected
         self._application.reset_poetry()
 
-        return super().execute(
-            args, inputs, interactive, verbosity, decorated, supports_utf8
-        )
+        try:
+            return super().execute(
+                args, inputs, interactive, verbosity, decorated, supports_utf8
+            )
+        except PoetryConsoleError as exc:
+            # Typically handling by poetry, but we need to handle it manually in our
+            # testing
+            self.io.write_line(str(exc))
+            self._status_code = exc.exit_code or 1
+            return self._status_code
