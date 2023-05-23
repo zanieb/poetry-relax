@@ -3,7 +3,7 @@ import sys
 from contextlib import contextmanager
 from functools import partial
 from pathlib import Path
-from typing import Any, Dict, Generator, Union
+from typing import Any, Dict, Generator, Optional, Union
 
 import tomlkit
 from cleo.commands.command import Command
@@ -167,10 +167,10 @@ class PoetryCommandTester(_CommandTester):
     def execute(
         self,
         args: str = "",
-        inputs: str | None = None,
-        interactive: bool | None = None,
-        verbosity: Verbosity | None = None,
-        decorated: bool | None = None,
+        inputs: Optional[str] = None,
+        interactive: Optional[bool] = None,
+        verbosity: Optional[Verbosity] = None,
+        decorated: Optional[bool] = None,
         supports_utf8: bool = True,
     ) -> int:
         # Reload the application to ensure that project changes are reflected
