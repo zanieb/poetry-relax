@@ -9,13 +9,13 @@ from typing import Callable
 import poetry
 import pytest
 from cleo.io.outputs.output import Verbosity
-from cleo.testers.command_tester import CommandTester
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import VirtualEnv
 
 from poetry_relax import RelaxCommand
 
 from ._utilities import (
+    PoetryCommandTester,
     assert_io_contains,
     assert_pyproject_matches,
     assert_pyproject_unchanged,
@@ -35,9 +35,7 @@ def relax_command(poetry_application: PoetryApplication):
     # Using a command tester is significantly faster than running subprocesses but
     # requires a little more setup
     command = RelaxCommand()
-    tester = CommandTester(command)
-
-    poetry_application.add(command)
+    tester = PoetryCommandTester(command, poetry_application)
 
     yield tester
 
@@ -48,14 +46,14 @@ def relax_command(poetry_application: PoetryApplication):
 
 @pytest.fixture
 def seeded_relax_command(
-    relax_command: CommandTester,
+    relax_command: PoetryCommandTester,
     seeded_poetry_project_path: Path,
     poetry_application_factory: Callable[[], PoetryApplication],
     seeded_project_venv: VirtualEnv,
 ):
     # Update the application for the command to the seeded version
     application = poetry_application_factory()
-    application.add(relax_command.command)
+    relax_command.configure_for_application(application)
 
     # Assert that the update above was successful
     assert check_paths_relative(
@@ -67,12 +65,6 @@ def seeded_relax_command(
             {relax_command.command.poetry.file.path}"
         """
 
-    # The following is necessary to set up the command and is usually handled by
-    # poetry.console.application.Application.__init__ on command dispatch. The tester
-    # appears to bypass these handlers so we duplicate the setup here
-    relax_command.command.set_env(seeded_project_venv)
-    application.configure_installer_for_command(relax_command.command, relax_command.io)
-
     yield relax_command
 
 
@@ -83,7 +75,9 @@ def autouse_poetry_project_path(poetry_project_path):
 
 
 @pytest.mark.parametrize("extra_options", ["", "--update", "--lock"])
-def test_newly_initialized_project(relax_command: CommandTester, extra_options: str):
+def test_newly_initialized_project(
+    relax_command: PoetryCommandTester, extra_options: str
+):
     with assert_pyproject_unchanged():
         relax_command.execute(extra_options)
 
@@ -91,7 +85,7 @@ def test_newly_initialized_project(relax_command: CommandTester, extra_options: 
     assert_io_contains("No dependencies to relax", relax_command.io)
 
 
-def test_group_does_not_exist(relax_command: CommandTester):
+def test_group_does_not_exist(relax_command: PoetryCommandTester):
     with assert_pyproject_unchanged():
         with pytest.raises(
             poetry.console.exceptions.GroupNotFound,
@@ -106,7 +100,7 @@ def test_group_does_not_exist(relax_command: CommandTester):
 
 
 def test_with_no_pyproject_toml(
-    relax_command: CommandTester, poetry_project_path: Path
+    relax_command: PoetryCommandTester, poetry_project_path: Path
 ):
     os.remove(poetry_project_path / "pyproject.toml")
 
@@ -116,7 +110,7 @@ def test_with_no_pyproject_toml(
         relax_command.execute("--check")
 
 
-def test_help(relax_command: CommandTester):
+def test_help(relax_command: PoetryCommandTester):
     with assert_pyproject_unchanged():
         relax_command.execute("--help")
 
@@ -132,7 +126,9 @@ def test_available_in_poetry_cli():
 
 
 @pytest.mark.parametrize("version", ["1", "1.0", "1.0b1", "2.0.0"])
-def test_single_simple_dependency_updated(relax_command: CommandTester, version: str):
+def test_single_simple_dependency_updated(
+    relax_command: PoetryCommandTester, version: str
+):
     # Add test package with pin
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["test"] = f"^{version}"
@@ -145,7 +141,7 @@ def test_single_simple_dependency_updated(relax_command: CommandTester, version:
     assert relax_command.status_code == 0
 
 
-def test_multiple_dependencies_updated(relax_command: CommandTester):
+def test_multiple_dependencies_updated(relax_command: PoetryCommandTester):
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["foo"] = "^1.0"
         pyproject["tool"]["poetry"]["dependencies"]["bar"] = "^2.0"
@@ -159,10 +155,12 @@ def test_multiple_dependencies_updated(relax_command: CommandTester):
     assert relax_command.status_code == 0
 
 
-def test_single_dependency_updated_in_group(relax_command: CommandTester):
+def test_single_dependency_updated_in_group(relax_command: PoetryCommandTester):
     # Add test package with pin
     with update_pyproject() as config:
         get_dependency_group(config, "dev")["test"] = "^1.0"
+
+    relax_command.command.reset_poetry()
 
     with assert_pyproject_matches() as expected_config:
         relax_command.execute("--group dev")
@@ -185,7 +183,7 @@ def test_single_dependency_updated_in_group(relax_command: CommandTester):
     ],
 )
 def test_multiple_constraint_dependency_only_updates_caret(
-    relax_command: CommandTester, input_version, output_version
+    relax_command: PoetryCommandTester, input_version, output_version
 ):
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["prefect"] = input_version
@@ -200,7 +198,7 @@ def test_multiple_constraint_dependency_only_updates_caret(
 
 @pytest.mark.parametrize("version", ["==1", ">=1.0", ">=1.0b1,<=2.0", "<=2.0.0"])
 def test_single_dependency_without_caret_constraint_not_updated(
-    relax_command: CommandTester, version: str
+    relax_command: PoetryCommandTester, version: str
 ):
     # Add test package with pin
     with update_pyproject() as pyproject:
@@ -213,7 +211,7 @@ def test_single_dependency_without_caret_constraint_not_updated(
 
 
 def test_dependency_updated_in_one_group_does_not_affect_other_groups(
-    relax_command: CommandTester,
+    relax_command: PoetryCommandTester,
 ):
     with update_pyproject() as config:
         get_dependency_group(config)["test"] = "^1.0"
@@ -230,7 +228,7 @@ def test_dependency_updated_in_one_group_does_not_affect_other_groups(
     assert relax_command.status_code == 0
 
 
-def test_dependency_with_additional_options(relax_command: CommandTester):
+def test_dependency_with_additional_options(relax_command: PoetryCommandTester):
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["test"] = {
             "version": "^1.0",
@@ -249,7 +247,7 @@ def test_dependency_with_additional_options(relax_command: CommandTester):
 
 
 def test_dependency_updated_with_validity_check(
-    seeded_relax_command: CommandTester,
+    seeded_relax_command: PoetryCommandTester,
     seeded_project_venv: VirtualEnv,
     seeded_cloudpickle_version: str,
 ):
@@ -271,7 +269,7 @@ def test_dependency_updated_with_validity_check(
 
 
 def test_dependency_relax_aborted_when_constraint_is_not_satisfiable(
-    seeded_relax_command: CommandTester,
+    seeded_relax_command: PoetryCommandTester,
 ):
     with update_pyproject() as pyproject:
         # Configure the pyproject with a version that does not exist
@@ -288,7 +286,7 @@ def test_dependency_relax_aborted_when_constraint_is_not_satisfiable(
 
 
 def test_dependency_relax_aborted_when_package_does_not_exist(
-    seeded_relax_command: CommandTester,
+    seeded_relax_command: PoetryCommandTester,
 ):
     fake_name = uuid.uuid4().hex
 
@@ -306,7 +304,7 @@ def test_dependency_relax_aborted_when_package_does_not_exist(
 
 
 def test_update_flag_upgrades_dependency_after_relax(
-    seeded_relax_command: CommandTester,
+    seeded_relax_command: PoetryCommandTester,
     seeded_project_venv: VirtualEnv,
     seeded_cloudpickle_version: str,
 ):
@@ -333,7 +331,7 @@ def test_update_flag_upgrades_dependency_after_relax(
 
 
 def test_lock_flag_only_updates_lockfile_after_relax(
-    seeded_relax_command: CommandTester,
+    seeded_relax_command: PoetryCommandTester,
     seeded_project_venv: VirtualEnv,
     seeded_cloudpickle_version: str,
 ):
@@ -367,7 +365,7 @@ def test_lock_flag_only_updates_lockfile_after_relax(
 @pytest.mark.parametrize("extra_options", ["", "--update", "--lock", "--check"])
 def test_dry_run_flag_prevents_changes(
     extra_options: str,
-    seeded_relax_command: CommandTester,
+    seeded_relax_command: PoetryCommandTester,
     seeded_project_venv: VirtualEnv,
     seeded_cloudpickle_version: str,
 ):
@@ -396,7 +394,7 @@ def test_dry_run_flag_prevents_changes(
     )
 
 
-def test_python_dependency_is_ignored(relax_command: CommandTester):
+def test_python_dependency_is_ignored(relax_command: PoetryCommandTester):
     # TODO: Consider changing this behavior before stable release.
     #       There are some peculiar issues with this though.
 
@@ -411,7 +409,7 @@ def test_python_dependency_is_ignored(relax_command: CommandTester):
 
 
 def test_invoked_from_subdirectory(
-    relax_command: CommandTester, poetry_project_path: Path
+    relax_command: PoetryCommandTester, poetry_project_path: Path
 ):
     child_dir = poetry_project_path / "child"
     child_dir.mkdir()
