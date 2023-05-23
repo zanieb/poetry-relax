@@ -186,5 +186,5 @@ class PoetryCommandTester(_CommandTester):
             # Typically handling by poetry, but we need to handle it manually in our
             # testing
             self.io.write_line(str(exc))
-            self._status_code = exc.exit_code or 1
+            self._status_code = getattr(exc, "exit_code", None) or 1
             return self._status_code
