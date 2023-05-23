@@ -87,16 +87,10 @@ def test_newly_initialized_project(
 
 def test_group_does_not_exist(relax_command: PoetryCommandTester):
     with assert_pyproject_unchanged():
-        with pytest.raises(
-            poetry.console.exceptions.GroupNotFound,
-            match=re.escape("Group(s) not found: iamnotagroup"),
-        ):
-            relax_command.execute("--group iamnotagroup")
+        relax_command.execute("--group iamnotagroup")
 
     assert relax_command.status_code == 1
-    assert_io_contains(
-        "No dependencies found in group 'iamnotagroup'", relax_command.io
-    )
+    assert_io_contains("Group(s) not found: iamnotagroup", relax_command.io)
 
 
 def test_with_no_pyproject_toml(
@@ -387,7 +381,8 @@ def test_dry_run_flag_prevents_changes(
 
     if "--check" in extra_options:
         assert_io_contains(
-            "Checking dependencies for relaxable constraints", seeded_relax_command.io
+            "Checking dependencies in group 'main' for relaxable constraints",
+            seeded_relax_command.io,
         )
     assert_io_contains(
         "Skipped update of config file due to dry-run flag.", seeded_relax_command.io
