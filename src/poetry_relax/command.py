@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, Dict, List, Set, cast
+from typing import Any, Dict, List, Set, Tuple
 
 # cleo is not PEP 561 compliant must be ignored
 # See https://github.com/python-poetry/cleo/pull/254
@@ -8,6 +8,7 @@ from packaging.version import Version
 from poetry.console.commands.init import InitCommand
 from poetry.console.commands.installer_command import InstallerCommand
 from poetry.core.factory import Factory
+from poetry.core.packages.dependency import Dependency
 from tomlkit.toml_document import TOMLDocument
 
 from poetry_relax._core import (
@@ -139,7 +140,9 @@ class RelaxCommand(InitCommand, InstallerCommand):
             self.info("No groups to relax.")
             return 1
 
-        updated_dependencies = {}  # Dependencies updated per group
+        updated_dependencies: Dict[
+            str, List[Tuple[str, Dependency]]
+        ] = {}  # Dependencies updated per group
 
         for group in groups:
             # Load dependencies in the given group
