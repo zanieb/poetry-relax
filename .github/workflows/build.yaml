@@ -67,7 +67,7 @@ jobs:
         run: |
           pip install poetry==${{ env.POETRY_VERSION }}
           poetry init --name 'test-project' --no-interaction
-          poetry source add test-pypi https://test.pypi.org/simple/ --secondary
+          poetry source add test-pypi https://test.pypi.org/simple/ --priority=explicit
 
       - name: Wait for package to be available
         run: >
