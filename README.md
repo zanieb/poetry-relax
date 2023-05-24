@@ -123,7 +123,7 @@ This plugin will only relax constraints specified with a caret (`^`). Upper cons
 
 > Is this plugin stable?
 
-This plugin is tested against multiple versions of Poetry and has an integration focused test suite. It is safe to use this in production, though it is recommend to pin versions. Breaking changes will be avoided unless infeasible due to upstream changes in Poetry.
+This plugin is tested against multiple versions of Poetry and has an integration focused test suite. It is safe to use this in production, though it is recommend to pin versions. Breaking changes will be avoided unless infeasible due to upstream changes in Poetry. This project follows the semantic versioning scheme and breaking changes will be denoted by a change to the major version number.
 
 > Will this plugin drop the upper bound on Python itself?
 
