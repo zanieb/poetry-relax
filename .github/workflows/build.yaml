@@ -23,7 +23,7 @@ jobs:
     outputs:
       build-version: ${{ steps.build.outputs.version }}
 
-    if: github.event.push || contains(github.event.pull_request.labels.*.name, 'test-build')
+    if: github.ref == 'refs/heads/main' || contains(github.event.pull_request.labels.*.name, 'test-build')
 
     steps:
       - uses: actions/checkout@v3
