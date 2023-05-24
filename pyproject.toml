@@ -41,6 +41,11 @@ pytest-xdist = ">=2.5.0"
 mypy = ">=0.971"
 types-setuptools = "^67.6.0.5"
 
+
+[[tool.poetry.source]]
+name = "PyPI"
+priority = "primary"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
