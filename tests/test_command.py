@@ -285,6 +285,24 @@ def test_dependency_updated_in_one_group_does_not_affect_other_groups(
     assert relax_command.status_code == 0
 
 
+def test_group_excluded_with_without_is_not_affected(
+    relax_command: PoetryCommandTester,
+):
+    with update_pyproject() as config:
+        get_dependency_group(config)["test"] = "^1.0"
+        get_dependency_group(config, "foo")["test"] = "^2.0"
+        get_dependency_group(config, "bar")["test"] = "^3.0"
+
+    with assert_pyproject_matches() as expected_config:
+        relax_command.execute("--without foo")
+
+        get_dependency_group(expected_config)["test"] = ">=1.0"
+        get_dependency_group(expected_config, "foo")["test"] = "^2.0"
+        get_dependency_group(expected_config, "bar")["test"] = ">=3.0"
+
+    assert relax_command.status_code == 0
+
+
 def test_dependency_with_additional_options(relax_command: PoetryCommandTester):
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["test"] = {
