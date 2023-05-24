@@ -54,6 +54,12 @@ class RelaxCommand(InitCommand, InstallerCommand):
                 "A group to relax constraints in."
                 " (<warning>Deprecated; use `--only` instead.</warning>)"
             ),
+        ),
+        option(
+            "without",
+            description="A group to exclude from relaxing constraints.",
+            flag=False,
+            default=None,
             multiple=True,
         ),
         option(
@@ -115,12 +121,21 @@ class RelaxCommand(InitCommand, InstallerCommand):
             {opt: (self.option(opt) or set()) for opt in {"only", "without", "group"}}
         )
 
-        groups = cast(List[str], self._get_only_group_option()) or list(
-            # Use all groups by default, including optional groups
-            sorted(self.poetry.package.dependency_group_names(include_optional=True))
-        )
+        groups = [
+            str(group)
+            for group in (
+                self.option("group")
+                # Use all groups by default, including optional groups
+                or sorted(
+                    self.poetry.package.dependency_group_names(include_optional=True)
+                )
+            )
+            # Exclude groups specified by the `--without` option
+            if group not in self.option("without")
+        ]
+
         if not groups:
-            self.info("No groups specified.")
+            self.info("No groups to relax.")
             return 1
 
         updated_dependencies = {}  # Dependencies updated per group
