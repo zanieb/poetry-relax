@@ -206,6 +206,23 @@ def test_single_dependency_updated_in_multiple_groups(
     assert relax_command.status_code == 0
 
 
+def test_group_with_no_dependencies_is_skipped(
+    relax_command: PoetryCommandTester,
+):
+    with update_pyproject() as config:
+        get_dependency_group(config, "foo")
+        get_dependency_group(config, "bar")["test"] = "^3.0"
+
+    with assert_pyproject_matches() as expected_config:
+        relax_command.execute()
+
+        get_dependency_group(expected_config, "foo")
+        get_dependency_group(expected_config, "bar")["test"] = ">=3.0"
+
+    assert relax_command.status_code == 0
+    assert_io_contains("No dependencies to relax in group 'foo'", relax_command.io)
+
+
 def test_multiple_dependencies_updated_in_multiple_groups(
     relax_command: PoetryCommandTester,
 ):
