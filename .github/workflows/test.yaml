@@ -51,6 +51,7 @@ jobs:
 
         include:
           - python-version: "3.12-dev"
+            os: "ubuntu-latest"
             # Only Poetry 1.5+ supports Python 3.12
             poetry-version: "1.5"
             # Run 3.12 tests with relaxed constraints
