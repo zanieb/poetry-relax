@@ -24,13 +24,12 @@ def _pretty_group(group: str) -> str:
     return f" in group <c1>{group!r}</c1>"
 
 
-class RelaxCommand(InitCommand, InstallerCommand):
+class RelaxCommand(InstallerCommand):
     """
     Implementation of `poetry relax`.
     """
 
-    # This inherits from `InitCommand` and `InstallerCommand` for access to internal
-    # utilities
+    # Inherits from `InstallerCommand` for access to internal utilities
 
     name = "relax"
     description = "Relax project dependencies."
