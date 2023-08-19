@@ -8,7 +8,6 @@ import sys
 from copy import copy
 from typing import (
     TYPE_CHECKING,
-    Any,
     Callable,
     Dict,
     Generator,
