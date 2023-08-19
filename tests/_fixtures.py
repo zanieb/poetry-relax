@@ -141,7 +141,7 @@ def poetry_project_path(base_poetry_project_path: Path, tmp_path: Path) -> Path:
 
 @pytest.fixture(scope="session")
 def seeded_base_poetry_project_path(
-    base_poetry_project_path: Path, seeded_cloudpickle_version
+    base_poetry_project_path: Path, seeded_cloudpickle_version, seeded_typing_extensions_version
 ) -> Path:
     with tempfile.TemporaryDirectory(prefix="poetry-relax-test-seeded-base") as tmpdir:
         seeded_base = Path(tmpdir).resolve() / "seeded-base"
@@ -151,12 +151,15 @@ def seeded_base_poetry_project_path(
         # Copy the initialized project into a the directory
         shutil.copytree(base_poetry_project_path, seeded_base, symlinks=True)
 
-        print(f"Installing 'cloudpickle=={seeded_cloudpickle_version}'")
+        print(
+            f"Installing 'cloudpickle=={seeded_cloudpickle_version}'"
+        )
         seed_process = subprocess.run(
             [
                 "poetry",
                 "add",
                 f"cloudpickle=={seeded_cloudpickle_version}",
+                "importlib_metadata>=6.0",  # Needed for checking installed package versions
                 "--no-interaction",
                 "-v",
             ],
@@ -174,12 +177,46 @@ def seeded_base_poetry_project_path(
 
         print()  # Poetry does not print newlines at the end of install
 
+
+        print(
+            f"Installing 'typing_extensions=={seeded_typing_extensions_version}' in group 'dev'"
+        )
+        seed_process = subprocess.run(
+            [
+                "poetry",
+                "add",
+                f"typing_extensions=={seeded_typing_extensions_version}",
+                "--group",
+                "dev",
+                "--no-interaction",
+                "-v",
+            ],
+            cwd=seeded_base,
+            stderr=subprocess.PIPE,
+            stdout=sys.stdout,
+            env={**os.environ},
+        )
+       
+
+        try:
+            seed_process.check_returncode()
+        except subprocess.CalledProcessError as exc:
+            seed_error = seed_process.stderr.decode().strip()
+            raise RuntimeError(f"Failed to seed test project: {seed_error}") from exc
+
+        print()  # Poetry does not print newlines at the end of install
+
         yield seeded_base
 
 
 @pytest.fixture(scope="session")
 def seeded_cloudpickle_version() -> str:
     yield "0.1.1"
+
+
+@pytest.fixture(scope="session")
+def seeded_typing_extensions_version() -> str:
+    yield "3.6.2"
 
 
 @pytest.fixture
