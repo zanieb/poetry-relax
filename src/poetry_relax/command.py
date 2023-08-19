@@ -17,6 +17,7 @@ from poetry_relax._core import (
     extract_dependency_config_for_group,
     flattened_dependency_config_items,
     run_installer_update,
+    update_dependency_config,
 )
 
 
@@ -273,26 +274,10 @@ class RelaxCommand(InstallerCommand):
 
             for old_constraint, dependency in updated_dependencies[group]:
                 # Mutate the dependency config (and consequently the pyproject config)
-                name = dependency.name
-
-                if isinstance(dependency_config[name], list):
-                    # When multiple constraints are given for a single dependency
-                    # we need to find out which one we've updated by checking for a matching marker
-                    for item in dependency_config[name]:
-                        if (
-                            Factory.create_dependency(name, item).marker
-                            == dependency.marker
-                        ):
-                            item["version"] = dependency.pretty_constraint
-                            break
-                    else:
-                        raise RuntimeError(
-                            f"Failed to find matching marker '{dependency.marker}' to update for dependency {name!r}."
-                        )
-                elif isinstance(dependency_config[name], dict):
-                    dependency_config[name]["version"] = dependency.pretty_constraint
-                else:
-                    dependency_config[name] = dependency.pretty_constraint
+                # (mypy complains because the type is not hinted as a mutable mapping)
+                dependency_config[dependency.name] = update_dependency_config(  # type: ignore
+                    dependency_config[dependency.name], dependency
+                )
 
                 # Display the final updates since they can be buried by the installer update
                 self.info(
