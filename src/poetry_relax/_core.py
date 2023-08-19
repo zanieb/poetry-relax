@@ -91,6 +91,7 @@ def run_installer_update(
 
     New dependencies are also whitelisted to be updated during locking.
     """
+    all_dependencies = []
 
     for group_name, dependencies in dependencies_by_group.items():
         group = poetry.package.dependency_group(group_name)
@@ -102,6 +103,8 @@ def run_installer_update(
             with contextlib.suppress(ValueError):
                 group.remove_dependency(dependency.name)
             group.add_dependency(dependency)
+
+        all_dependencies.extend(dependencies)
 
     # Refresh the locker
     poetry.set_locker(poetry.locker.__class__(poetry.locker.lock, poetry_config))
@@ -115,7 +118,7 @@ def run_installer_update(
     if lockfile_only:
         installer.lock()
 
-    installer.whitelist([d.name for d in dependencies])
+    installer.whitelist([d.name for d in all_dependencies])
 
     last_line: str = ""
 
