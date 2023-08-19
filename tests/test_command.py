@@ -430,6 +430,48 @@ def test_update_flag_upgrades_dependency_after_relax(
     ), f"The dependency should be updated to the next major version but has version {new_cloudpickle_version}"
 
 
+def test_update_flag_upgrades_dependencies_across_groups_after_relax(
+    seeded_relax_command: PoetryCommandTester,
+    seeded_project_venv: VirtualEnv,
+    seeded_cloudpickle_version: str,
+    seeded_typing_extensions_version: str,
+):
+    # Regression test for https://github.com/zanieb/poetry-relax/issues/50
+    
+    with update_pyproject() as pyproject:
+        pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
+        get_dependency_group(pyproject, "dev")["typing-extensions"] = "^3.0"
+
+    with assert_pyproject_matches() as expected_config:
+        seeded_relax_command.execute("--update", verbosity=Verbosity.DEBUG)
+        expected_config["tool"]["poetry"]["dependencies"]["cloudpickle"] = ">=1.0"
+        get_dependency_group(expected_config, "dev")["typing-extensions"] = ">=3.0"
+
+    assert seeded_relax_command.status_code == 0
+
+    new_cloudpickle_version = seeded_project_venv.run_python_script(
+        "import cloudpickle; print(cloudpickle.__version__)"
+    ).strip()
+
+    assert (
+        new_cloudpickle_version != seeded_cloudpickle_version
+    ), f"The dependency should be updated but has initial version {new_cloudpickle_version}"
+    assert (
+        int(new_cloudpickle_version[0]) > 1
+    ), f"The dependency should be updated to the next major version but has version {new_cloudpickle_version}"
+
+    new_typing_extensions_version = seeded_project_venv.run_python_script(
+        "import importlib_metadata; print(importlib_metadata.version('typing_extensions'))"
+    ).strip()
+
+    assert (
+        new_typing_extensions_version != seeded_typing_extensions_version
+    ), f"The dependency should be updated but has initial version {new_typing_extensions_version}"
+    assert (
+        int(new_typing_extensions_version[0]) > 1
+    ), f"The dependency should be updated to the next major version but has version {new_typing_extensions_version}"
+
+
 def test_lock_flag_only_updates_lockfile_after_relax(
     seeded_relax_command: PoetryCommandTester,
     seeded_project_venv: VirtualEnv,
