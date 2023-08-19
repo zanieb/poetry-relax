@@ -141,7 +141,9 @@ def poetry_project_path(base_poetry_project_path: Path, tmp_path: Path) -> Path:
 
 @pytest.fixture(scope="session")
 def seeded_base_poetry_project_path(
-    base_poetry_project_path: Path, seeded_cloudpickle_version, seeded_typing_extensions_version
+    base_poetry_project_path: Path,
+    seeded_cloudpickle_version,
+    seeded_typing_extensions_version,
 ) -> Path:
     with tempfile.TemporaryDirectory(prefix="poetry-relax-test-seeded-base") as tmpdir:
         seeded_base = Path(tmpdir).resolve() / "seeded-base"
@@ -151,9 +153,7 @@ def seeded_base_poetry_project_path(
         # Copy the initialized project into a the directory
         shutil.copytree(base_poetry_project_path, seeded_base, symlinks=True)
 
-        print(
-            f"Installing 'cloudpickle=={seeded_cloudpickle_version}'"
-        )
+        print(f"Installing 'cloudpickle=={seeded_cloudpickle_version}'")
         seed_process = subprocess.run(
             [
                 "poetry",
@@ -177,7 +177,6 @@ def seeded_base_poetry_project_path(
 
         print()  # Poetry does not print newlines at the end of install
 
-
         print(
             f"Installing 'typing_extensions=={seeded_typing_extensions_version}' in group 'dev'"
         )
@@ -196,7 +195,6 @@ def seeded_base_poetry_project_path(
             stdout=sys.stdout,
             env={**os.environ},
         )
-       
 
         try:
             seed_process.check_returncode()

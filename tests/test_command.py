@@ -437,7 +437,7 @@ def test_update_flag_upgrades_dependencies_across_groups_after_relax(
     seeded_typing_extensions_version: str,
 ):
     # Regression test for https://github.com/zanieb/poetry-relax/issues/50
-    
+
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["cloudpickle"] = "^1.0"
         get_dependency_group(pyproject, "dev")["typing-extensions"] = "^3.0"
