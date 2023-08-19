@@ -341,7 +341,7 @@ def test_dependency_with_additional_options(relax_command: PoetryCommandTester):
 def test_dependency_with_multiple_conditional_versions(
     relax_command: PoetryCommandTester,
 ):
-    # Add test package with pin
+    # Add test package with multiple versions conditional on the Python version
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["test"] = [
             {"version": "<=1.9", "python": ">=3.6,<3.8"},
@@ -358,7 +358,7 @@ def test_dependency_with_multiple_conditional_versions(
     assert relax_command.status_code == 0
 
 
-def test_dependency_updated_with_validity_check(
+def test_dependency_relax_with_validity_check(
     seeded_relax_command: PoetryCommandTester,
     seeded_project_venv: VirtualEnv,
     seeded_cloudpickle_version: str,
@@ -391,6 +391,27 @@ def test_dependency_relax_aborted_when_constraint_is_not_satisfiable(
 
         # Configure a valid version in another group — should not be relaxed
         get_dependency_group(pyproject, "dev")["cloudpickle"] = "^1.0"
+
+    with assert_pyproject_unchanged():
+        seeded_relax_command.execute("--check")
+
+    assert seeded_relax_command.status_code == 1
+    assert_io_contains(
+        "Aborted relax due to failure during dependency update",
+        seeded_relax_command.io,
+    )
+
+
+def test_dependency_relax_aborted_when_complex_constraint_is_not_satisfiable(
+    seeded_relax_command: PoetryCommandTester,
+):
+    # Add test package with multiple versions conditional on the Python version
+    with update_pyproject() as pyproject:
+        pyproject["tool"]["poetry"]["dependencies"]["test"] = [
+            {"version": "<=1.9", "python": ">=3.6,<3.10"},
+            # Use a version that does not exist
+            {"version": "^999.0", "python": ">=3.10"},
+        ]
 
     with assert_pyproject_unchanged():
         seeded_relax_command.execute("--check")

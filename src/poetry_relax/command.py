@@ -207,10 +207,13 @@ class RelaxCommand(InstallerCommand):
             if self.io.is_verbose():
                 for group in groups:
                     for old_constraint, dependency in updated_dependencies[group]:
+                        marker = (
+                            f" (when {dependency.marker})" if dependency.marker else ""
+                        )
                         self.info(
                             f"Proposing update for <c1>{dependency.name}</> constraint from "
                             f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
-                            f"{_pretty_group(group)}"
+                            f"{marker}{_pretty_group(group)}"
                         )
 
             should_not_update = self.option("dry-run") or not (
@@ -280,10 +283,11 @@ class RelaxCommand(InstallerCommand):
                 )
 
                 # Display the final updates since they can be buried by the installer update
+                marker = f" (when {dependency.marker})" if dependency.marker else ""
                 self.info(
                     f"Updated <c1>{dependency.pretty_name}</> constraint from "
                     f"<c2>{old_constraint}</> to <c2>{dependency.pretty_constraint}</>"
-                    f"{_pretty_group(group)}"
+                    f"{marker}{_pretty_group(group)}"
                 )
 
         if status == 0 and not self.option("dry-run"):
