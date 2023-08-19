@@ -135,26 +135,6 @@ def test_single_simple_dependency_updated(
     assert relax_command.status_code == 0
 
 
-def test_single_complex_dependency_updated(
-    relax_command: PoetryCommandTester,
-):
-    # Add test package with pin
-    with update_pyproject() as pyproject:
-        pyproject["tool"]["poetry"]["dependencies"]["test"] = [
-            {"version": "<=1.9", "python": ">=3.6,<3.8"},
-            {"version": "^2.0", "python": ">=3.8"},
-        ]
-
-    with assert_pyproject_matches() as expected_config:
-        relax_command.execute()
-
-        expected_config["tool"]["poetry"]["dependencies"]["test"] = [
-            {"version": "<=1.9", "python": ">=3.6,<3.8"},
-            {"version": ">=2.0", "python": ">=3.8"},
-        ]
-    assert relax_command.status_code == 0
-
-
 def test_multiple_dependencies_updated(relax_command: PoetryCommandTester):
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["foo"] = "^1.0"
@@ -355,6 +335,26 @@ def test_dependency_with_additional_options(relax_command: PoetryCommandTester):
             "allow-prereleases": True,
         }
 
+    assert relax_command.status_code == 0
+
+
+def test_dependency_with_multiple_conditional_versions(
+    relax_command: PoetryCommandTester,
+):
+    # Add test package with pin
+    with update_pyproject() as pyproject:
+        pyproject["tool"]["poetry"]["dependencies"]["test"] = [
+            {"version": "<=1.9", "python": ">=3.6,<3.8"},
+            {"version": "^2.0", "python": ">=3.8"},
+        ]
+
+    with assert_pyproject_matches() as expected_config:
+        relax_command.execute()
+
+        expected_config["tool"]["poetry"]["dependencies"]["test"] = [
+            {"version": "<=1.9", "python": ">=3.6,<3.8"},
+            {"version": ">=2.0", "python": ">=3.8"},
+        ]
     assert relax_command.status_code == 0
 
 
