@@ -1,5 +1,5 @@
-from cleo.events.console_command_event import ConsoleCommandEvent
 from cleo.events.console_events import COMMAND, TERMINATE
+from cleo.events.console_terminate_event import ConsoleTerminateEvent
 from cleo.events.event_dispatcher import EventDispatcher
 from poetry.console.application import Application
 from poetry.console.commands.add import AddCommand
@@ -17,18 +17,18 @@ def _command_factory() -> RelaxCommand:
 class RelaxPlugin(ApplicationPlugin):
     def activate(self, application: Application):
         application.command_loader.register_factory("relax", _command_factory)
-        application.event_dispatcher.add_listener(TERMINATE, self._auto_relax)
+        application.event_dispatcher.add_listener(TERMINATE, self._auto_relax)  # type: ignore
 
     def _auto_relax(
-        self, event: ConsoleCommandEvent, event_name: str, dispatcher: EventDispatcher
+        self, event: ConsoleTerminateEvent, event_name: str, dispatcher: EventDispatcher
     ) -> None:
         # Do not run on failed commands
         if event.exit_code:
-            return event.exit_code
+            return
 
         # Only run on `poetry add`
         if not isinstance(event.command, AddCommand):
-            return event.exit_code
+            return
 
         # Only run on opt-in
         if (
@@ -54,4 +54,5 @@ class RelaxPlugin(ApplicationPlugin):
 
         # Write a new line for readability
         event.command.io.write_line("")
-        return event.command.call("relax", " ".join(args))
+
+        event.set_exit_code(event.command.call("relax", " ".join(args)))
