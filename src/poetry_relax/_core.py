@@ -12,11 +12,14 @@ from typing import (
     Dict,
     Generator,
     Iterable,
+    List,
     Optional,
     Tuple,
+    Union,
 )
 
 import packaging.version
+from poetry.core.factory import Factory
 from poetry.core.packages.dependency_group import MAIN_GROUP
 
 if TYPE_CHECKING:
@@ -264,3 +267,42 @@ def drop_caret_bound_from_dependency(dependency: "Dependency") -> "Dependency":
     new_dependency.constraint = new_version  # type: ignore
 
     return new_dependency
+
+
+def update_dependency_config(
+    config: Union[List["DependencyConstraint"], "DependencyConstraint"],
+    dependency: "Dependency",
+) -> Union[List["DependencyConstraint"], "DependencyConstraint"]:
+    """
+    Update the configuration for a single dependency to use the constraints from a
+    new dependency object.
+    """
+    if isinstance(config, list):
+        # When multiple constraints are given for a single dependency
+        # we need to find out which one we've updated by checking for a matching marker
+        return [
+            update_dependency_constraint(item, dependency)
+            if (
+                Factory.create_dependency(dependency.name, item).marker
+                == dependency.marker
+            )
+            else item
+            for item in config
+        ]
+    else:
+        return update_dependency_constraint(config, dependency)
+
+
+def update_dependency_constraint(
+    constraint: "DependencyConstraint", dependency: "Dependency"
+) -> "DependencyConstraint":
+    """
+    Update the constraint of a dependency config to use the constraint from a
+    new dependency object.
+    """
+    if isinstance(constraint, dict):
+        new_constraint = constraint.copy()
+        new_constraint["version"] = dependency.pretty_constraint
+        return new_constraint
+    else:
+        return dependency.pretty_constraint
