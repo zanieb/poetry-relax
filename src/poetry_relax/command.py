@@ -5,7 +5,6 @@ from typing import Any, Dict, List, Set, Tuple
 # See https://github.com/python-poetry/cleo/pull/254
 from cleo.helpers import option  # type: ignore
 from packaging.version import Version
-from poetry.console.commands.init import InitCommand
 from poetry.console.commands.installer_command import InstallerCommand
 from poetry.core.factory import Factory
 from poetry.core.packages.dependency import Dependency
