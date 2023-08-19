@@ -6,7 +6,16 @@ import functools
 import re
 import sys
 from copy import copy
-from typing import TYPE_CHECKING, Any, Callable, Dict, Iterable, Optional
+from typing import (
+    TYPE_CHECKING,
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Iterable,
+    Optional,
+    Tuple,
+)
 
 import packaging.version
 from poetry.core.packages.dependency_group import MAIN_GROUP
@@ -14,9 +23,11 @@ from poetry.core.packages.dependency_group import MAIN_GROUP
 if TYPE_CHECKING:
     # See https://github.com/python-poetry/cleo/pull/254 for ignore
     from cleo.io.io import IO  # type: ignore
+    from poetry.core.factory import DependencyConfig, DependencyConstraint
     from poetry.core.packages.dependency import Dependency
     from poetry.installation.installer import Installer
     from poetry.poetry import Poetry
+
 
 if sys.version_info < (3, 8):  # Python 3.7 support
     import pkg_resources
@@ -150,7 +161,7 @@ def run_installer_update(
 
 def extract_dependency_config_for_group(
     group: str, poetry_config: dict
-) -> Optional[dict]:
+) -> Optional["DependencyConfig"]:
     """
     Retrieve the dictionary of dependencies defined for the given group in the poetry
     config.
@@ -161,6 +172,20 @@ def extract_dependency_config_for_group(
         return poetry_config.get("dependencies", None)
 
     return poetry_config.get("group", {}).get(group, {}).get("dependencies", None)
+
+
+def flattened_dependency_config_items(
+    config: "DependencyConfig",
+) -> Generator[Tuple[str, "DependencyConstraint"], None, None]:
+    """
+    Flatten dependencies with multiple constraints into separate dependencies.
+    """
+    for name, constraints in config.items():
+        if isinstance(constraints, list):
+            for constraint in constraints:
+                yield name, constraint
+        else:
+            yield name, constraints
 
 
 def drop_upper_bound_from_version_range(constraint: VersionRange) -> VersionRange:
