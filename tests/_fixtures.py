@@ -159,7 +159,7 @@ def seeded_base_poetry_project_path(
                 "poetry",
                 "add",
                 f"cloudpickle=={seeded_cloudpickle_version}",
-                "importlib_metadata>=6.0",  # Needed for checking installed package versions
+                "importlib_metadata>=1.0",  # Needed for checking installed package versions
                 "--no-interaction",
                 "-v",
             ],
