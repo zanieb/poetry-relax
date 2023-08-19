@@ -142,7 +142,7 @@ def test_single_complex_dependency_updated(
     with update_pyproject() as pyproject:
         pyproject["tool"]["poetry"]["dependencies"]["test"] = [
             {"version": "<=1.9", "python": ">=3.6,<3.8"},
-            {"version": "^2.0", "python": ">=3.8"}
+            {"version": "^2.0", "python": ">=3.8"},
         ]
 
     with assert_pyproject_matches() as expected_config:
@@ -150,7 +150,7 @@ def test_single_complex_dependency_updated(
 
         expected_config["tool"]["poetry"]["dependencies"]["test"] = [
             {"version": "<=1.9", "python": ">=3.6,<3.8"},
-            {"version": ">=2.0", "python": ">=3.8"}
+            {"version": ">=2.0", "python": ">=3.8"},
         ]
     assert relax_command.status_code == 0
 

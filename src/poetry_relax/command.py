@@ -15,6 +15,7 @@ from poetry_relax._core import (
     PoetryConsoleError,
     drop_caret_bound_from_dependency,
     extract_dependency_config_for_group,
+    flattened_dependency_config_items,
     run_installer_update,
 )
 
@@ -158,8 +159,10 @@ class RelaxCommand(InstallerCommand):
 
             # Parse the dependencies
             target_dependencies = [
-                Factory.create_dependency(name, constraints)
-                for name, constraints in dependency_config.items()
+                Factory.create_dependency(name, constraint)
+                for name, constraint in flattened_dependency_config_items(
+                    dependency_config
+                )
                 if name != "python"
             ]
 
