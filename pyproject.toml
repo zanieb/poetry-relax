@@ -27,7 +27,7 @@ classifiers = [
 ]
 
 [tool.poetry.dependencies]
-python = "^3.7"
+python = "^3.8"
 poetry = ">=1.2"
 
 [tool.poetry.plugins."poetry.application.plugin"]
