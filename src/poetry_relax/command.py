@@ -249,7 +249,8 @@ class RelaxCommand(InstallerCommand):
                     verbose=self.io.is_verbose(),
                     silent=(
                         # Do not display installer output by default, it's confusing
-                        should_not_update and not self.io.is_verbose()
+                        should_not_update
+                        and not self.io.is_verbose()
                     ),
                 )
             except Exception as exc:
