@@ -54,9 +54,7 @@ def poetry_application(
     # There are a few assertions in this style, as these fixtures were finicky to get
     # behaving correctly and we want to ensure our assumptions are correct before
     # tests run
-    assert check_paths_relative(
-        application.poetry.file.path, poetry_project_path
-    ), f"""
+    assert check_paths_relative(application.poetry.file.path, poetry_project_path), f"""
         The poetry application's config file should be relative to the test project path:
             {poetry_project_path}
         but the following path was found:
@@ -113,9 +111,7 @@ def base_poetry_project_path(
             )
 
         tmp_path = Path(tmpdir).resolve()
-        assert check_paths_relative(
-            env.path, tmp_path
-        ), f"""
+        assert check_paths_relative(env.path, tmp_path), f"""
             The virtual environment in the base test project should be in the 
             temporary directory:
                 {tmp_path} 
@@ -249,9 +245,7 @@ def seeded_project_venv(
     print(f"Loading virtual environment at {executable}")
     env = manager.get(reload=True)
 
-    assert check_paths_relative(
-        env.path, seeded_poetry_project_path
-    ), f"""
+    assert check_paths_relative(env.path, seeded_poetry_project_path), f"""
         The virtual environment in the test project should be in the project path:
             {seeded_poetry_project_path} 
         but the following path was activated:
