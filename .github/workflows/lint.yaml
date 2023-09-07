@@ -40,7 +40,7 @@ jobs:
 
       - name: Lint
         run: |
-          ./bin/lint check .
+          ./scripts/lint check .
 
       - name: Check poetry
         run: |
