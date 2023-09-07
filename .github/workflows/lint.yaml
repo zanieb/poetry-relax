@@ -40,7 +40,7 @@ jobs:
 
       - name: Check format
         run: |
-          ruff format --check .
+          poetry run -- ruff format --check .
 
       - name: Lint
         run: |
