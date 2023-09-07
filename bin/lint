@@ -28,15 +28,16 @@ fi
 if [ "$mode" = "check" ]; then
     echo "Checking for lint..."
     run isort --profile black --check --diff $targets
-    run black --check --diff $targets
+    run ruff format --check $targets
     run mypy --namespace-packages --exclude tests $targets 
 elif [ "$mode" = "fix" ]; then
     echo "Fixing lint..."
     run isort --profile black $targets
-    run black $targets
+    run ruff format $targets
 else
     echo "Unknown mode '$mode' expected 'fix' or 'check'."
     exit 3
+
 fi;
 
 # TODO: See note above.
