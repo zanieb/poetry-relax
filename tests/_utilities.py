@@ -5,7 +5,6 @@ from functools import partial
 from pathlib import Path
 from typing import Any, Dict, Generator, Optional, Union
 
-import packaging.version
 import tomlkit
 from cleo.commands.command import Command
 from cleo.io.outputs.output import Verbosity
@@ -13,7 +12,6 @@ from cleo.testers.command_tester import CommandTester as _CommandTester
 from poetry.console.application import Application as PoetryApplication
 from poetry.core.packages.dependency_group import MAIN_GROUP
 from poetry.utils.env import EnvManager
-
 from poetry_relax._core import PoetryConsoleError
 
 PYPROJECT = "pyproject.toml"

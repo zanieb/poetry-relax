@@ -1,17 +1,14 @@
 import os
-import re
 import subprocess
 import sys
 import uuid
 from pathlib import Path
 from typing import Callable
 
-import poetry
 import pytest
 from cleo.io.outputs.output import Verbosity
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import VirtualEnv
-
 from poetry_relax import RelaxCommand
 
 from ._utilities import (
