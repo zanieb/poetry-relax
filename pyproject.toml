@@ -45,3 +45,9 @@ ruff = ">=0.0.287"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+extend-select = ["I"]
+
+# Line length is enforced by the formatter
+ignore = ["E501"]

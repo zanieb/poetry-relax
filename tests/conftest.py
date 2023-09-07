@@ -4,4 +4,4 @@ import pytest
 # Note: This must occur before import of the module
 pytest.register_assert_rewrite("tests._utilities")
 
-from ._fixtures import *
+from ._fixtures import *  # noqa
