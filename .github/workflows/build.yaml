@@ -53,7 +53,7 @@ jobs:
         env:
           POETRY_PYPI_TOKEN_TEST_PYPI: ${{ secrets.TEST_PYPI_API_TOKEN }}
         run: |
-          version=$(./bin/version dev)
+          version=$(./scripts/version dev)
           echo "::set-output name=version::$version"
           poetry version $version
           poetry config repositories.test-pypi https://test.pypi.org/legacy/
