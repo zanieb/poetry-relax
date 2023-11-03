@@ -44,7 +44,9 @@ else:
 
 
 if POETRY_VERSION < packaging.version.Version("1.3.0"):
-    from poetry.core.semver.version_range import VersionRange
+    # fmt: off
+    from poetry.core.semver.version_range import VersionRange  # mypy: ignore [import-not-found]
+    # fmt: on
 else:
     from poetry.core.constraints.version import VersionRange
 
