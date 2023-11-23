@@ -262,6 +262,10 @@ def drop_caret_bound_from_dependency(dependency: "Dependency") -> "Dependency":
     # Copy the existing dependency to retain as much information as possible
     new_dependency = copy(dependency)
 
+    # If the constraint is empty, assignment will fail
+    if not new_version:
+        return dependency
+
     # Update the constraint to the new version
     # The property setter parses this into a proper constraint type
     new_dependency.constraint = new_version  # type: ignore
