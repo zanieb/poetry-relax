@@ -335,6 +335,22 @@ def test_dependency_with_additional_options(relax_command: PoetryCommandTester):
     assert relax_command.status_code == 0
 
 
+def test_dependency_with_git_url(relax_command: PoetryCommandTester):
+    with update_pyproject() as pyproject:
+        pyproject["tool"]["poetry"]["dependencies"]["test"] = {
+            "git": "https://github.com/zanieb/test.git"
+        }
+
+    with assert_pyproject_matches() as expected_config:
+        relax_command.execute()
+
+        expected_config["tool"]["poetry"]["dependencies"]["test"] = {
+            "git": "https://github.com/zanieb/test.git"
+        }
+
+    assert relax_command.status_code == 0
+
+
 def test_dependency_with_multiple_conditional_versions(
     relax_command: PoetryCommandTester,
 ):
