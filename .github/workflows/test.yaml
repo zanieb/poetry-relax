@@ -52,13 +52,23 @@ jobs:
           - "1.7"
 
         include:
+
+          # Run 3.12 tests with relaxed constraints
           - python-version: "3.12"
             os: "ubuntu-latest"
-            # Run 3.12 tests with relaxed constraints
             relax: true
 
+          # Run Windows and macOS tests for a single Poetry/Python pair
+          - os: "windows-latest"
+            python-version: "3.12"
+            poetry-version: "1.7"
+
+          - os: "macos-latest"
+            python-version: "3.12"
+            poetry-version: "1.7"
+
         exclude:
-          # The following versions do not support Python 3.12
+          # The following Poetry versions do not support Python 3.12
           - python-version: "3.12"
             poetry-version: 1.2
           - python-version: "3.12"

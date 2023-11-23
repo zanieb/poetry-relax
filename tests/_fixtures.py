@@ -232,7 +232,10 @@ def seeded_poetry_project_path(
 def seeded_project_venv(
     seeded_poetry_project_path: Path, poetry_application_factory: PoetryApplication
 ) -> VirtualEnv:
-    executable = seeded_poetry_project_path / ".venv" / "bin" / "python"
+    if sys.platform == "win32":
+        executable = seeded_poetry_project_path / ".venv" / "Scripts" / "python.exe"
+    else:
+        executable = seeded_poetry_project_path / ".venv" / "bin" / "python"
 
     assert executable.exists(), f"""
         The virtual environment should exist in the test project path but was not found at:
