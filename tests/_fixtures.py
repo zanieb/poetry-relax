@@ -110,7 +110,7 @@ def base_poetry_project_path(
             )
 
         tmp_path = Path(tmpdir).resolve()
-        assert check_paths_relative(env.path, tmp_path), f"""
+        assert check_paths_relative(env.path.resolve(), tmp_path), f"""
             The virtual environment in the base test project should be in the 
             temporary directory:
                 {tmp_path} 
