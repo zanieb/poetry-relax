@@ -42,14 +42,10 @@ else:
 
     POETRY_VERSION = packaging.version.Version(importlib_metadata.version("poetry"))
 
-
 if POETRY_VERSION < packaging.version.Version("1.3.0"):
-    # fmt: off
-    from poetry.core.semver.version_range import VersionRange  # mypy: ignore [import-not-found]
-    # fmt: on
+    from poetry.core.semver.version_range import VersionRange  # type: ignore
 else:
     from poetry.core.constraints.version import VersionRange
-
 
 if POETRY_VERSION < packaging.version.Version("1.3.0"):
     # Poetry 1.2.x defined a different name for Cleo 1.x
