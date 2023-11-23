@@ -31,12 +31,12 @@ concurrency:
 
 jobs:
   python-tests:
-    name: Python ${{ matrix.python-version }}, Poetry ${{ matrix.poetry-version}} / ${{ matrix.os }}
+    name: Python ${{ matrix.python-version }}, Poetry ${{ matrix.poetry-version}}, ${{ matrix.os }}
 
     strategy:
       matrix:
         os:
-          - ubuntu
+          - "Ubuntu"
         python-version:
           - "3.8"
           - "3.9"
@@ -55,15 +55,15 @@ jobs:
 
           # Run 3.12 tests with relaxed constraints
           - python-version: "3.12"
-            os: "ubuntu"
+            os: "Ubuntu"
             relax: true
 
           # Run Windows and macOS tests for a single Poetry/Python pair
-          - os: "windows"
+          - os: "Windows"
             python-version: "3.12"
             poetry-version: "1.7"
 
-          - os: "macos"
+          - os: "macOS"
             python-version: "3.12"
             poetry-version: "1.7"
 
