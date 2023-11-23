@@ -255,6 +255,10 @@ def drop_caret_bound_from_dependency(dependency: "Dependency") -> "Dependency":
     If the dependency does not use a caret constraint to specify its upper bound,
     it will not be changed but a new copy will be returned.
     """
+    # If the constraint is empty, there is nothing to do
+    if not dependency.pretty_constraint:
+        return dependency
+
     new_version = mutate_constraint(
         dependency.pretty_constraint, drop_upper_bound_from_caret_constraint
     )
@@ -264,7 +268,9 @@ def drop_caret_bound_from_dependency(dependency: "Dependency") -> "Dependency":
 
     # If the constraint is empty, assignment will fail
     if not new_version:
-        return dependency
+        raise ValueError(
+            f"Updating constraint for {dependency} resulted in an empty version"
+        )
 
     # Update the constraint to the new version
     # The property setter parses this into a proper constraint type
