@@ -2,6 +2,8 @@ name: Lint
 
 env:
   POETRY_VERSION: "1.6.1"
+  # Set the terminal so `tput` will work
+  TERM: "linux"
 
 on:
   pull_request:
