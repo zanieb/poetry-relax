@@ -24,7 +24,7 @@ def load_tomlfile(path: Union[str, Path] = "./") -> tomlkit.TOMLDocument:
 
 @contextmanager
 def update_tomlfile(
-    file: Union[str, Path]
+    file: Union[str, Path],
 ) -> Generator[tomlkit.TOMLDocument, None, None]:
     """
     Updates a toml file by reading then yielding the existing contents for mutation.
@@ -36,7 +36,7 @@ def update_tomlfile(
 
 @contextmanager
 def assert_tomlfile_matches(
-    file: Union[str, Path]
+    file: Union[str, Path],
 ) -> Generator[tomlkit.TOMLDocument, None, None]:
     """
     Asserts that the toml file in the given directory (defaults to current)
