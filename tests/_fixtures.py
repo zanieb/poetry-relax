@@ -65,7 +65,7 @@ def poetry_application(
 
 @pytest.fixture(scope="session")
 def base_poetry_project_path(
-    poetry_application_factory: Callable[[], PoetryApplication]
+    poetry_application_factory: Callable[[], PoetryApplication],
 ) -> Path:
     with tempfile.TemporaryDirectory(prefix="poetry-relax-test-base") as tmpdir:
         # Create virtual environments in the temporary project
