@@ -5,11 +5,11 @@
     <a href="https://devguide.python.org/versions/" alt="Supported Python versions">
         <img alt="Supported Python versions" src="https://img.shields.io/pypi/pyversions/poetry-relax?style=flat-square">
     </a>
-    <a href="https://github.com/madkinsz/poetry-relax/actions/workflows/test.yaml?query=branch%3Amain" alt="Test status">
-        <img alt="Test status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/test.yaml?label=test&style=flat-square">
+    <a href="https://github.com/zanieb/poetry-relax/actions/workflows/test.yaml?query=branch%3Amain" alt="Test status">
+        <img alt="Test status" src="https://img.shields.io/github/actions/workflow/status/zanieb/poetry-relax/test.yaml?label=test&style=flat-square">
     </a>
-    <a href="https://github.com/madkinsz/poetry-relax/actions/workflows/build.yaml?query=branch%3Amain" alt="Build status">
-        <img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/madkinsz/poetry-relax/build.yaml?label=build&style=flat-square">
+    <a href="https://github.com/zanieb/poetry-relax/actions/workflows/build.yaml?query=branch%3Amain" alt="Build status">
+        <img alt="Build status" src="https://img.shields.io/github/actions/workflow/status/zanieb/poetry-relax/build.yaml?label=build&style=flat-square">
     </a>
 </p>
 
@@ -102,20 +102,20 @@ The behavior of Poetry is quite reasonable for local development! `poetry relax`
 
 Run `poetry relax` before building and publishing a package.
 
-See it at work in [the release workflow for this project](https://github.com/madkinsz/poetry-relax/blob/main/.github/workflows/release.yaml).
+See it at work in [the release workflow for this project](https://github.com/zanieb/poetry-relax/blob/main/.github/workflows/release.yaml).
 
 
 ### Relaxing requirements for testing
 
 Run `poetry relax --update` before tests to test against the newest possible versions of packages.
 
-See it at work in [the test workflow for this project](https://github.com/madkinsz/poetry-relax/blob/main/.github/workflows/test.yaml).
+See it at work in [the test workflow for this project](https://github.com/zanieb/poetry-relax/blob/main/.github/workflows/test.yaml).
 
 ## Frequently asked questions
 
 > Can this plugin change the behavior of `poetry add` to relax constraints?
 
-Not at this time. The Poetry project states that plugins must not alter the behavior of core Poetry commands. If this behavior would be useful for you, please chime in [on the tracking issue](https://github.com/madkinsz/poetry-relax/issues/5).
+Not at this time. The Poetry project states that plugins must not alter the behavior of core Poetry commands. If this behavior would be useful for you, please chime in [on the tracking issue](https://github.com/zanieb/poetry-relax/issues/5).
 
 > Does this plugin remove upper constraints I've added?
 
@@ -135,7 +135,7 @@ This project is managed with Poetry. Here are the basics for getting started.
 
 Clone the repository:
 ```bash
-$ git clone https://github.com/madkinsz/poetry-relax.git
+$ git clone https://github.com/zanieb/poetry-relax.git
 $ cd poetry-relax
 ```
 
