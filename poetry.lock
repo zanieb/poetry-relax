@@ -866,7 +866,7 @@ name = "pycparser"
 version = "2.21"
 description = "C parser in Python"
 optional = false
-python-versions = "*"
+python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 files = [
     {file = "pycparser-2.21-py2.py3-none-any.whl", hash = "sha256:8ee45429555515e1f6b185e78100aea234072576aa43ab53aefcae078162fca9"},
     {file = "pycparser-2.21.tar.gz", hash = "sha256:e644fdec12f7872f86c58ff790da456218b10f863970249516d60a5eaca77206"},
@@ -1163,13 +1163,13 @@ files = [
 
 [[package]]
 name = "types-setuptools"
-version = "69.0.0.20240106"
+version = "69.0.0.20240115"
 description = "Typing stubs for setuptools"
 optional = false
 python-versions = ">=3.8"
 files = [
-    {file = "types-setuptools-69.0.0.20240106.tar.gz", hash = "sha256:e077f9089578df3c9938f6e4aa1633f182ba6740a6fdb1333f162bae5dfcbadc"},
-    {file = "types_setuptools-69.0.0.20240106-py3-none-any.whl", hash = "sha256:b1da8981425723a674fd459c43dfa4402abeaee3f9cf682723ee9cf226125cc3"},
+    {file = "types-setuptools-69.0.0.20240115.tar.gz", hash = "sha256:1a9c863899f40cbe2053d0cd1d00ddef0330b492335467d018f73c1fec9462a3"},
+    {file = "types_setuptools-69.0.0.20240115-py3-none-any.whl", hash = "sha256:7409e774c69e1810cb45052dbaed839fc30302e86a3ff945172ef2a2e7ab46f8"},
 ]
 
 [[package]]
