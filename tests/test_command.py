@@ -9,6 +9,7 @@ import pytest
 from cleo.io.outputs.output import Verbosity
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import VirtualEnv
+
 from poetry_relax import RelaxCommand
 
 from ._utilities import (
