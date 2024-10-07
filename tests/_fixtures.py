@@ -10,6 +10,7 @@ import packaging.version
 import pytest
 from poetry.console.application import Application as PoetryApplication
 from poetry.utils.env import EnvManager, VirtualEnv
+
 from poetry_relax._core import POETRY_VERSION
 
 from ._utilities import check_paths_relative, tmpchdir
